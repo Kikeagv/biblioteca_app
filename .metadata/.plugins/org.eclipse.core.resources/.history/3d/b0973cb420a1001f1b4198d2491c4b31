@@ -1,0 +1,89 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.service.PrestamoService;
+
+import javax.swing.*;
+
+public class PrestamosUI {
+    private PrestamoService prestamoService = new PrestamoService();
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Gestión de Préstamos");
+        frame.setSize(600, 400);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        frame.add(panel);
+        colocarComponentes(panel);
+
+        frame.setVisible(true);
+    }
+
+    private void colocarComponentes(JPanel panel) {
+        panel.setLayout(null);
+
+        JLabel lblUsuario = new JLabel("Usuario:");
+        lblUsuario.setBounds(20, 20, 100, 25);
+        panel.add(lblUsuario);
+
+        JTextField txtUsuario = new JTextField(20);
+        txtUsuario.setBounds(120, 20, 200, 25);
+        panel.add(txtUsuario);
+
+        JLabel lblEjemplar = new JLabel("ID Ejemplar:");
+        lblEjemplar.setBounds(20, 60, 100, 25);
+        panel.add(lblEjemplar);
+
+        JTextField txtEjemplar = new JTextField(20);
+        txtEjemplar.setBounds(120, 60, 200, 25);
+        panel.add(txtEjemplar);
+
+        JLabel lblTipoMaterial = new JLabel("Tipo de Material:");
+        lblTipoMaterial.setBounds(20, 100, 120, 25);
+        panel.add(lblTipoMaterial);
+
+        JTextField txtTipoMaterial = new JTextField(20);
+        txtTipoMaterial.setBounds(140, 100, 180, 25);
+        panel.add(txtTipoMaterial);
+
+        JButton btnPrestar = new JButton("Registrar Préstamo");
+        btnPrestar.setBounds(120, 160, 200, 30);
+        panel.add(btnPrestar);
+
+        // Action Listener for Registering Loans
+        btnPrestar.addActionListener(e -> {
+            String usuario = txtUsuario.getText().trim();
+            String tipoMaterial = txtTipoMaterial.getText().trim();
+            String ejemplarText = txtEjemplar.getText().trim();
+
+            // Validate input
+            if (usuario.isEmpty() || tipoMaterial.isEmpty() || ejemplarText.isEmpty()) {
+                JOptionPane.showMessageDialog(panel, "Todos los campos son obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try {
+                int ejemplarId = Integer.parseInt(ejemplarText);
+
+                // Call the service to register the loan
+                if (prestamoService.puedePrestar(usuario, ejemplarId, tipoMaterial)) {
+                    prestamoService.registrarPrestamo(usuario, ejemplarId, tipoMaterial);
+                    JOptionPane.showMessageDialog(panel, "Préstamo registrado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(panel, "No se puede registrar el préstamo. Verifique el estado del usuario, la disponibilidad del material o el límite de préstamos.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(panel, "El ID del ejemplar debe ser un número válido.", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(panel, "Error al registrar el préstamo: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        JButton btnCerrar = new JButton("Cerrar");
+        btnCerrar.setBounds(120, 220, 200, 30);
+        panel.add(btnCerrar);
+
+        // Action Listener to close the window
+        btnCerrar.addActionListener(e -> ((JFrame) SwingUtilities.getWindowAncestor(panel)).dispose());
+    }
+}

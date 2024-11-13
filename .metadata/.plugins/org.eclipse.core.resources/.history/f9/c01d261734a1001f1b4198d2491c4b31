@@ -1,0 +1,70 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.service.PrestamoService;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.util.List;
+import java.util.Map;
+
+public class VerPrestamosUI {
+    private PrestamoService prestamoService = new PrestamoService();
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Préstamos Actuales");
+        frame.setSize(600, 400);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        frame.add(panel);
+
+        colocarComponentes(panel);
+
+        frame.setVisible(true);
+    }
+
+    private void colocarComponentes(JPanel panel) {
+        JLabel lblUsuario = new JLabel("Usuario:");
+        lblUsuario.setBounds(20, 20, 100, 25);
+        panel.add(lblUsuario);
+
+        JTextField txtUsuario = new JTextField(20);
+        txtUsuario.setBounds(100, 20, 200, 25);
+        panel.add(txtUsuario);
+
+        JButton btnBuscar = new JButton("Buscar");
+        btnBuscar.setBounds(320, 20, 100, 25);
+        panel.add(btnBuscar);
+
+        JTable table = new JTable();
+        table.setBounds(20, 70, 540, 250);
+        panel.add(table);
+
+        btnBuscar.addActionListener(e -> {
+            String username = txtUsuario.getText().trim();
+            if (username.isEmpty()) {
+                JOptionPane.showMessageDialog(panel, "Debe ingresar un nombre de usuario.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            List<Map<String, String>> prestamos = prestamoService.obtenerPrestamosActivos(username);
+            DefaultTableModel model = new DefaultTableModel();
+            model.addColumn("ID");
+            model.addColumn("Material");
+            model.addColumn("Fecha Préstamo");
+            model.addColumn("Estado");
+
+            for (Map<String, String> prestamo : prestamos) {
+                model.addRow(new Object[]{
+                        prestamo.get("id"),
+                        prestamo.get("material"),
+                        prestamo.get("fecha_prestamo"),
+                        prestamo.get("estado")
+                });
+            }
+
+            table.setModel(model);
+        });
+    }
+}

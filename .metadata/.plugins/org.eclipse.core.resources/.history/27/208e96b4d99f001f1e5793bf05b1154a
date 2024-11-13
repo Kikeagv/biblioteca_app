@@ -1,0 +1,64 @@
+package com.biblioteca.service;
+
+import com.biblioteca.dao.UsuarioDAO;
+
+public class UsuarioService {
+
+    private UsuarioDAO usuarioDAO = new UsuarioDAO();
+
+    // Método para validar el inicio de sesión de un usuario
+    public String login(String username, String password) {
+        if (usuarioDAO.validarUsuario(username, password)) {
+            System.out.println("Inicio de sesión exitoso para el usuario: " + username);
+            return usuarioDAO.obtenerRol(username); // Devuelve el rol del usuario
+        } else {
+            System.out.println("Usuario o contraseña incorrectos.");
+            return null; // Retorna null si las credenciales son incorrectas
+        }
+    }
+
+    public String obtenerRol(String username) {
+        String sql = "SELECT rol FROM usuarios WHERE username = ?";
+        try (Connection con = ConexionBD.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("rol"); // Devuelve el rol del usuario
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Retorna null si no se encuentra el usuario
+    }
+
+
+    // Método para registrar un nuevo usuario
+    public void registrarUsuario(String nombre, String username, String password, String rol) {
+        try {
+            usuarioDAO.registrarUsuario(nombre, username, password, rol);
+            System.out.println("Usuario registrado correctamente: " + username);
+        } catch (Exception e) {
+            System.err.println("Error al registrar el usuario: " + e.getMessage());
+        }
+    }
+
+    // Método para restablecer la contraseña de un usuario
+    public void restablecerContrasena(String username, String nuevaPassword) {
+        try {
+            usuarioDAO.restablecerContrasena(username, nuevaPassword);
+            System.out.println("Contraseña restablecida correctamente para el usuario: " + username);
+        } catch (Exception e) {
+            System.err.println("Error al restablecer la contraseña: " + e.getMessage());
+        }
+    }
+
+    // Método para consultar información de un usuario
+    public void consultarUsuario(String username) {
+        String infoUsuario = usuarioDAO.consultarUsuario(username);
+        System.out.println(infoUsuario);
+    }
+    
+    
+}

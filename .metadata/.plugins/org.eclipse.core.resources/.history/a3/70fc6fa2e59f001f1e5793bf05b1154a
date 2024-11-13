@@ -1,0 +1,51 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.service.UsuarioService;
+
+import javax.swing.*;
+import java.util.List;
+
+public class VerUsuariosUI {
+
+    private UsuarioService usuarioService = new UsuarioService();
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Lista de Usuarios");
+        frame.setSize(600, 400);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        frame.add(panel);
+
+        JLabel lblTitulo = new JLabel("Usuarios:");
+        lblTitulo.setBounds(20, 20, 200, 25);
+        panel.add(lblTitulo);
+
+        DefaultListModel<String> model = new DefaultListModel<>();
+        List<String> usuarios = usuarioService.listarUsuarios();
+        for (String usuario : usuarios) {
+            model.addElement(usuario);
+        }
+
+        JList<String> listaUsuarios = new JList<>(model);
+        JScrollPane scrollPane = new JScrollPane(listaUsuarios);
+        scrollPane.setBounds(20, 60, 400, 200);
+        panel.add(scrollPane);
+
+        JButton btnSeleccionar = new JButton("Seleccionar");
+        btnSeleccionar.setBounds(450, 60, 100, 25);
+        panel.add(btnSeleccionar);
+
+        btnSeleccionar.addActionListener(e -> {
+            String seleccionado = listaUsuarios.getSelectedValue();
+            if (seleccionado != null) {
+                new OpcionesUsuarioUI(seleccionado).mostrarVentana();
+            } else {
+                JOptionPane.showMessageDialog(panel, "Seleccione un usuario.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        frame.setVisible(true);
+    }
+}

@@ -1,0 +1,148 @@
+package com.biblioteca.dao;
+
+import com.biblioteca.conexion.ConexionBD;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+
+
+
+public class EjemplarDAO {
+	
+	public List<String[]> consultarEjemplares() {
+	    String sql = "SELECT id, tipo, titulo, unidades_disponibles, ubicacion FROM materiales";
+	    List<String[]> ejemplares = new ArrayList<>();
+	    try (Connection con = ConexionBD.conectar();
+	         PreparedStatement ps = con.prepareStatement(sql);
+	         ResultSet rs = ps.executeQuery()) {
+	        while (rs.next()) {
+	            ejemplares.add(new String[]{
+	                String.valueOf(rs.getInt("id")),
+	                rs.getString("tipo"),
+	                rs.getString("titulo"),
+	                String.valueOf(rs.getInt("unidades_disponibles")),
+	                rs.getString("ubicacion")
+	            });
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return ejemplares;
+	}
+
+	
+	public void registrarEjemplar(String tipo, String titulo, int cantidad, String ubicacion) {
+	    String sql = "INSERT INTO materiales (tipo, titulo, unidades_disponibles, ubicacion, fecha_registro) VALUES (?, ?, ?, ?, NOW())";
+	    try (Connection con = ConexionBD.conectar();
+	         PreparedStatement ps = con.prepareStatement(sql)) {
+	        ps.setString(1, tipo);
+	        ps.setString(2, titulo);
+	        ps.setInt(3, cantidad);
+	        ps.setString(4, ubicacion);
+	        ps.executeUpdate();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
+
+
+    public void registrarEjemplarConDetalles(String tipo, String titulo, String codigoInterno, int cantidad, String ubicacion, Map<String, String> detallesEspecificos) {
+        String sqlMateriales = "INSERT INTO materiales (tipo, titulo, codigo_interno, unidades_disponibles, ubicacion, fecha_registro) VALUES (?, ?, ?, ?, ?, NOW())";
+        try (Connection con = ConexionBD.conectar();
+             PreparedStatement psMateriales = con.prepareStatement(sqlMateriales, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+            // Insertar en la tabla `materiales`
+            psMateriales.setString(1, tipo);
+            psMateriales.setString(2, titulo);
+            psMateriales.setString(3, codigoInterno);
+            psMateriales.setInt(4, cantidad);
+            psMateriales.setString(5, ubicacion);
+            psMateriales.executeUpdate();
+
+            // Obtener el ID generado para el material
+            ResultSet rs = psMateriales.getGeneratedKeys();
+            if (rs.next()) {
+                int idMaterial = rs.getInt(1);
+
+                // Insertar detalles específicos en la tabla correspondiente
+                registrarDetallesEspecificos(con, idMaterial, tipo, detallesEspecificos);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void registrarDetallesEspecificos(Connection con, int idMaterial, String tipo, Map<String, String> detallesEspecificos) throws SQLException {
+        String sql;
+
+        switch (tipo) {
+            case "Libro":
+                sql = "INSERT INTO libros (id, autor, editorial, isbn, numero_paginas) VALUES (?, ?, ?, ?, ?)";
+                try (PreparedStatement ps = con.prepareStatement(sql)) {
+                    ps.setInt(1, idMaterial);
+                    ps.setString(2, detallesEspecificos.get("Autor"));
+                    ps.setString(3, detallesEspecificos.get("Editorial"));
+                    ps.setString(4, detallesEspecificos.get("ISBN"));
+                    ps.setInt(5, Integer.parseInt(detallesEspecificos.get("Número de Páginas")));
+                    ps.executeUpdate();
+                }
+                break;
+
+            case "Revista":
+                sql = "INSERT INTO revistas (id, editorial, periodicidad, fecha_publicacion) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement ps = con.prepareStatement(sql)) {
+                    ps.setInt(1, idMaterial);
+                    ps.setString(2, detallesEspecificos.get("Editorial"));
+                    ps.setString(3, detallesEspecificos.get("Periodicidad"));
+                    ps.setDate(4, java.sql.Date.valueOf(detallesEspecificos.get("Fecha de Publicación")));
+                    ps.executeUpdate();
+                }
+                break;
+
+            case "Tesis":
+                sql = "INSERT INTO tesis (id, autor, titulo_investigacion, carrera, universidad, anio_presentacion) VALUES (?, ?, ?, ?, ?, ?)";
+                try (PreparedStatement ps = con.prepareStatement(sql)) {
+                    ps.setInt(1, idMaterial);
+                    ps.setString(2, detallesEspecificos.get("Autor"));
+                    ps.setString(3, detallesEspecificos.get("Título de Investigación"));
+                    ps.setString(4, detallesEspecificos.get("Carrera"));
+                    ps.setString(5, detallesEspecificos.get("Universidad"));
+                    ps.setInt(6, Integer.parseInt(detallesEspecificos.get("Año de Presentación")));
+                    ps.executeUpdate();
+                }
+                break;
+
+            case "CD":
+                sql = "INSERT INTO cds (id, artista, genero, duracion, numero_canciones) VALUES (?, ?, ?, ?, ?)";
+                try (PreparedStatement ps = con.prepareStatement(sql)) {
+                    ps.setInt(1, idMaterial);
+                    ps.setString(2, detallesEspecificos.get("Artista"));
+                    ps.setString(3, detallesEspecificos.get("Género"));
+                    ps.setTime(4, java.sql.Time.valueOf(detallesEspecificos.get("Duración")));
+                    ps.setInt(5, Integer.parseInt(detallesEspecificos.get("Número de Canciones")));
+                    ps.executeUpdate();
+                }
+                break;
+
+            case "DVD":
+                sql = "INSERT INTO dvds (id, director, genero, duracion) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement ps = con.prepareStatement(sql)) {
+                    ps.setInt(1, idMaterial);
+                    ps.setString(2, detallesEspecificos.get("Director"));
+                    ps.setString(3, detallesEspecificos.get("Género"));
+                    ps.setTime(4, java.sql.Time.valueOf(detallesEspecificos.get("Duración")));
+                    ps.executeUpdate();
+                }
+                break;
+
+            default:
+                // Si el tipo es "Otro", no se requiere insertar en tablas adicionales.
+                break;
+        }
+    }
+}

@@ -1,0 +1,71 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.service.UsuarioService;
+
+import javax.swing.*;
+
+public class UsuariosUI {
+    private UsuarioService usuarioService = new UsuarioService();
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Gestión de Usuarios");
+        frame.setSize(500, 400);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        frame.add(panel);
+        colocarComponentes(panel);
+
+        frame.setVisible(true);
+    }
+
+    private void colocarComponentes(JPanel panel) {
+        panel.setLayout(null);
+
+        JLabel lblNombre = new JLabel("Nombre:");
+        lblNombre.setBounds(20, 20, 100, 25);
+        panel.add(lblNombre);
+
+        JTextField txtNombre = new JTextField(20);
+        txtNombre.setBounds(120, 20, 200, 25);
+        panel.add(txtNombre);
+
+        JLabel lblUsuario = new JLabel("Usuario:");
+        lblUsuario.setBounds(20, 60, 100, 25);
+        panel.add(lblUsuario);
+
+        JTextField txtUsuario = new JTextField(20);
+        txtUsuario.setBounds(120, 60, 200, 25);
+        panel.add(txtUsuario);
+
+        JLabel lblPassword = new JLabel("Contraseña:");
+        lblPassword.setBounds(20, 100, 100, 25);
+        panel.add(lblPassword);
+
+        JPasswordField txtPassword = new JPasswordField(20);
+        txtPassword.setBounds(120, 100, 200, 25);
+        panel.add(txtPassword);
+
+        JLabel lblRol = new JLabel("Rol:");
+        lblRol.setBounds(20, 140, 100, 25);
+        panel.add(lblRol);
+
+        JComboBox<String> cmbRol = new JComboBox<>(usuarioService.listarRoles().toArray(new String[0]));
+        cmbRol.setBounds(120, 140, 200, 25);
+        panel.add(cmbRol);
+
+        JButton btnRegistrar = new JButton("Registrar Usuario");
+        btnRegistrar.setBounds(120, 200, 200, 25);
+        panel.add(btnRegistrar);
+
+        btnRegistrar.addActionListener(e -> {
+            String nombre = txtNombre.getText();
+            String usuario = txtUsuario.getText();
+            String password = new String(txtPassword.getPassword());
+            String rol = (String) cmbRol.getSelectedItem();
+
+            usuarioService.registrarUsuario(nombre, usuario, password, rol);
+            JOptionPane.showMessageDialog(panel, "Usuario registrado correctamente.");
+        });
+    }
+}

@@ -1,0 +1,41 @@
+package com.biblioteca.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import com.biblioteca.conexion.ConexionBD;
+
+public class PrestamoDAO {
+
+    public boolean tieneMora(String username) {
+        String sql = "SELECT mora FROM prestamos WHERE username = ? AND devuelto = false";
+        try (Connection con = ConexionBD.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    double mora = rs.getDouble("mora");
+                    return mora > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void registrarPrestamo(String username, int ejemplarId) {
+        String sql = "INSERT INTO prestamos (username, ejemplar_id, fecha_prestamo) VALUES (?, ?, NOW())";
+        try (Connection con = ConexionBD.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ps.setInt(2, ejemplarId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean verificarDisponibilidad(int ejemplarId)

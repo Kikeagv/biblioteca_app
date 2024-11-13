@@ -1,0 +1,91 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.dao.EjemplarDAO;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+
+public class EjemplaresUI {
+    private EjemplarDAO ejemplarDAO = new EjemplarDAO();
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Gestión de Ejemplares");
+        frame.setSize(600, 500);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        frame.add(panel);
+        colocarComponentes(panel);
+
+        frame.setVisible(true);
+    }
+
+    private void colocarComponentes(JPanel panel) {
+        panel.setLayout(null);
+
+        JLabel lblTitulo = new JLabel("Título:");
+        lblTitulo.setBounds(20, 20, 100, 25);
+        panel.add(lblTitulo);
+
+        JTextField txtTitulo = new JTextField(20);
+        txtTitulo.setBounds(120, 20, 200, 25);
+        panel.add(txtTitulo);
+
+        JLabel lblAutor = new JLabel("Autor:");
+        lblAutor.setBounds(20, 60, 100, 25);
+        panel.add(lblAutor);
+
+        JTextField txtAutor = new JTextField(20);
+        txtAutor.setBounds(120, 60, 200, 25);
+        panel.add(txtAutor);
+
+        JLabel lblCantidad = new JLabel("Cantidad:");
+        lblCantidad.setBounds(20, 100, 100, 25);
+        panel.add(lblCantidad);
+
+        JTextField txtCantidad = new JTextField(20);
+        txtCantidad.setBounds(120, 100, 200, 25);
+        panel.add(txtCantidad);
+
+        JLabel lblUbicacion = new JLabel("Ubicación:");
+        lblUbicacion.setBounds(20, 140, 100, 25);
+        panel.add(lblUbicacion);
+
+        JTextField txtUbicacion = new JTextField(20);
+        txtUbicacion.setBounds(120, 140, 200, 25);
+        panel.add(txtUbicacion);
+
+        JButton btnRegistrar = new JButton("Registrar Ejemplar");
+        btnRegistrar.setBounds(120, 180, 200, 25);
+        panel.add(btnRegistrar);
+
+        btnRegistrar.addActionListener(e -> {
+            String titulo = txtTitulo.getText();
+            String autor = txtAutor.getText();
+            int cantidad = Integer.parseInt(txtCantidad.getText());
+            String ubicacion = txtUbicacion.getText();
+
+            ejemplarDAO.registrarEjemplar(titulo, autor, cantidad, ubicacion);
+            JOptionPane.showMessageDialog(panel, "Ejemplar registrado correctamente.");
+        });
+
+        JButton btnConsultar = new JButton("Consultar Ejemplares");
+        btnConsultar.setBounds(120, 220, 200, 25);
+        panel.add(btnConsultar);
+
+        btnConsultar.addActionListener(e -> {
+            List<String[]> ejemplares = ejemplarDAO.consultarEjemplares();
+            StringBuilder resultado = new StringBuilder();
+
+            for (String[] ejemplar : ejemplares) {
+                resultado.append(String.join(", ", ejemplar)).append("\n");
+            }
+
+            JOptionPane.showMessageDialog(panel, resultado.toString());
+        });
+
+    }
+}

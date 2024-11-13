@@ -1,0 +1,149 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.service.PrestamoService;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.util.List;
+
+public class HacerPrestamoUI {
+    private PrestamoService prestamoService = new PrestamoService();
+    private JTable materialTable;
+    private JTable userTable;
+    private int selectedMaterialId = -1;
+    private int selectedUserId = -1;
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Préstamo de Material");
+        frame.setSize(800, 600);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        frame.add(mainPanel);
+
+        colocarComponentes(mainPanel, frame);
+
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    private void colocarComponentes(JPanel mainPanel, JFrame frame) {
+        JTabbedPane tabbedPane = new JTabbedPane();
+
+        // Materials Tab
+        JPanel materialsTab = new JPanel(new BorderLayout());
+        colocarListaMateriales(materialsTab);
+        tabbedPane.addTab("Seleccionar Material", materialsTab);
+
+        // Users Tab
+        JPanel usersTab = new JPanel(new BorderLayout());
+        colocarListaUsuarios(usersTab);
+        tabbedPane.addTab("Seleccionar Usuario", usersTab);
+
+        mainPanel.add(tabbedPane, BorderLayout.CENTER);
+
+        // Footer with Action Buttons
+        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton btnPrestar = new JButton("Registrar Préstamo");
+        JButton btnCancelar = new JButton("Cancelar");
+
+        btnPrestar.addActionListener(e -> registrarPrestamo(frame));
+        btnCancelar.addActionListener(e -> frame.dispose());
+
+        footerPanel.add(btnPrestar);
+        footerPanel.add(btnCancelar);
+
+        mainPanel.add(footerPanel, BorderLayout.SOUTH);
+    }
+
+    private void colocarListaMateriales(JPanel materialsTab) {
+        JPanel searchPanel = new JPanel(new BorderLayout());
+        JTextField txtSearch = new JTextField();
+        JButton btnSearch = new JButton("Buscar");
+
+        searchPanel.add(txtSearch, BorderLayout.CENTER);
+        searchPanel.add(btnSearch, BorderLayout.EAST);
+
+        DefaultTableModel materialsModel = new DefaultTableModel(new Object[]{"ID", "Tipo", "Título", "Unidades Disponibles"}, 0);
+        materialTable = new JTable(materialsModel);
+        JScrollPane scrollPane = new JScrollPane(materialTable);
+
+        materialsTab.add(searchPanel, BorderLayout.NORTH);
+        materialsTab.add(scrollPane, BorderLayout.CENTER);
+
+        List<String[]> materiales = prestamoService.obtenerMaterialesDisponibles("");
+        actualizarTablaMateriales(materialesModel, materiales);
+
+        btnSearch.addActionListener(e -> {
+            String criterio = txtSearch.getText();
+            List<String[]> resultados = prestamoService.obtenerMaterialesDisponibles(criterio);
+            actualizarTablaMateriales(materialsModel, resultados);
+        });
+
+        materialTable.getSelectionModel().addListSelectionListener(e -> {
+            int selectedRow = materialTable.getSelectedRow();
+            if (selectedRow != -1) {
+                selectedMaterialId = Integer.parseInt(materialsModel.getValueAt(selectedRow, 0).toString());
+            }
+        });
+    }
+
+    private void colocarListaUsuarios(JPanel usersTab) {
+        DefaultTableModel usersModel = new DefaultTableModel(new Object[]{"ID", "Nombre", "Estado"}, 0);
+        userTable = new JTable(usersModel) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        JScrollPane scrollPane = new JScrollPane(userTable);
+
+        usersTab.add(scrollPane, BorderLayout.CENTER);
+
+        List<String[]> usuarios = prestamoService.obtenerUsuarios();
+        actualizarTablaUsuarios(usersModel, usuarios);
+
+        userTable.getSelectionModel().addListSelectionListener(e -> {
+            int selectedRow = userTable.getSelectedRow();
+            if (selectedRow != -1) {
+                selectedUserId = Integer.parseInt(usersModel.getValueAt(selectedRow, 0).toString());
+            }
+        });
+    }
+
+    private void actualizarTablaMateriales(DefaultTableModel model, List<String[]> data) {
+        model.setRowCount(0);
+        for (String[] row : data) {
+            model.addRow(row);
+        }
+    }
+
+    private void actualizarTablaUsuarios(DefaultTableModel model, List<String[]> data) {
+        model.setRowCount(0);
+        for (String[] row : data) {
+            String estado = row[2].equals("Bloqueado") ? "Bloqueado" : "Activo";
+            model.addRow(new Object[]{row[0], row[1], estado});
+        }
+    }
+
+    private void registrarPrestamo(JFrame frame) {
+        if (selectedMaterialId == -1) {
+            JOptionPane.showMessageDialog(frame, "Seleccione un material para el préstamo.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (selectedUserId == -1) {
+            JOptionPane.showMessageDialog(frame, "Seleccione un usuario para el préstamo.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            prestamoService.registrarPrestamo(selectedUserId, selectedMaterialId);
+            JOptionPane.showMessageDialog(frame, "Préstamo registrado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            frame.dispose();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(frame, "Error al registrar el préstamo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}

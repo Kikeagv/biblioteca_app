@@ -1,0 +1,33 @@
+package com.biblioteca.ui;
+
+import javax.swing.*;
+
+public class GestionUsuariosUI {
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Gestión de Usuarios");
+        frame.setSize(400, 300);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        frame.add(panel);
+        colocarComponentes(panel);
+
+        frame.setVisible(true);
+    }
+
+    private void colocarComponentes(JPanel panel) {
+        panel.setLayout(null);
+
+        JButton btnAgregarUsuario = new JButton("Agregar Usuario");
+        btnAgregarUsuario.setBounds(100, 50, 200, 30);
+        panel.add(btnAgregarUsuario);
+
+        JButton btnVerUsuarios = new JButton("Ver Usuarios");
+        btnVerUsuarios.setBounds(100, 100, 200, 30);
+        panel.add(btnVerUsuarios);
+
+        btnAgregarUsuario.addActionListener(e -> new UsuariosUI().mostrarVentana());
+        btnVerUsuarios.addActionListener(e -> new VerUsuariosUI().mostrarVentana());
+    }
+}

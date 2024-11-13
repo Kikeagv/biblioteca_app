@@ -1,0 +1,38 @@
+package com.biblioteca.ui;
+
+import javax.swing.*;
+
+public class PrestamosUI {
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Gestión de Préstamos");
+        frame.setSize(400, 300);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        frame.add(panel);
+
+        colocarComponentes(panel);
+
+        frame.setVisible(true);
+    }
+
+    private void colocarComponentes(JPanel panel) {
+        JLabel lblTitulo = new JLabel("Gestión de Préstamos");
+        lblTitulo.setBounds(120, 20, 200, 30);
+        panel.add(lblTitulo);
+
+        JButton btnHacerPrestamo = new JButton("Hacer préstamo de material");
+        btnHacerPrestamo.setBounds(100, 70, 200, 30);
+        panel.add(btnHacerPrestamo);
+
+        JButton btnVerPrestamos = new JButton("Ver préstamos actuales");
+        btnVerPrestamos.setBounds(100, 170, 200, 30);
+        panel.add(btnVerPrestamos);
+
+        // Action Listeners for the buttons
+        btnHacerPrestamo.addActionListener(e -> new HacerPrestamoUI().mostrarVentana());
+        btnVerPrestamos.addActionListener(e -> new VerPrestamosUI().mostrarVentana());
+    }
+}

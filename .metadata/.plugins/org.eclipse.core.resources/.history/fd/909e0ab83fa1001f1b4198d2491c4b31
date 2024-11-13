@@ -1,0 +1,109 @@
+package com.biblioteca.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.biblioteca.dao.PrestamoDAO;
+
+public class PrestamoService {
+
+    private PrestamoDAO prestamoDAO = new PrestamoDAO();
+    private UsuarioDAO usuarioDAO = new UsuarioDAO();
+
+    // Check if a user can borrow based on their status and material availability
+    public boolean puedePrestar(String username, int ejemplarId, String tipoMaterial) {
+        if (prestamoDAO.tienePrestamosDefaulter(username)) {
+            System.out.println("El usuario tiene préstamos vencidos.");
+            return false;
+        }
+
+        if (!prestamoDAO.validarDisponibilidadMaterial(ejemplarId)) {
+            System.out.println("El material no está disponible para préstamo.");
+            return false;
+        }
+
+        if (!prestamoDAO.validarLimitePrestamos(username, tipoMaterial)) {
+            System.out.println("El usuario ha alcanzado el límite de préstamos para el tipo: " + tipoMaterial);
+            return false;
+        }
+
+        return true;
+    }
+
+
+
+
+    // Register a new loan after validations
+    public void registrarPrestamo(String username, int ejemplarId, String tipoMaterial) {
+        if (!puedePrestar(username, ejemplarId, tipoMaterial)) {
+            System.out.println("No se puede registrar el préstamo.");
+            return;
+        }
+        prestamoDAO.registrarPrestamo(username, ejemplarId); // This calls the fixed DAO method
+
+        System.out.println("Préstamo registrado correctamente.");
+    }
+
+
+    // Register the return of a borrowed material
+    public void registrarDevolucion(int prestamoId, double tasaDiaria) {
+        double mora = prestamoDAO.calcularMora(prestamoId, tasaDiaria);
+        prestamoDAO.registrarDevolucion(prestamoId); // This calls the fixed DAO method
+
+        if (mora > 0) {
+            prestamoDAO.registrarMora(prestamoId, mora);
+            System.out.println("Mora registrada: $" + mora);
+        } else {
+            System.out.println("Devolución registrada sin mora.");
+        }
+    }
+
+    // Calculate overdue penalties
+    public double calcularMora(int prestamoId, double tasaDiaria) {
+        return prestamoDAO.calcularMora(prestamoId, tasaDiaria);
+    }
+    
+    public List<Map<String, String>> obtenerPrestamosActivos(String username) {
+        return prestamoDAO.obtenerPrestamosActivos(username);
+    }
+    
+    public List<Map<String, String>> obtenerTodosPrestamos() {
+        return prestamoDAO.obtenerTodosPrestamos();
+    }
+    
+    public List<Map<String, String>> obtenerPrestamosPendientes(String username) {
+        return prestamoDAO.obtenerPrestamosPendientes(username);
+    }
+
+    public List<Map<String, String>> obtenerPrestamosPendientesConMora(String username) {
+        return prestamoDAO.obtenerPrestamosPendientesConMora(username);
+    }
+
+    public void agregarMora(int prestamoId, double montoDiario) {
+        prestamoDAO.agregarMora(prestamoId, montoDiario);
+    }
+    
+    public boolean puedePrestar(int userId, int materialId) {
+        if (!prestamoDAO.validarDisponibilidadMaterial(materialId)) {
+            System.out.println("El material no está disponible.");
+            return false;
+        }
+        if (!usuarioDAO.validarUsuario(userId)) {
+            System.out.println("El usuario tiene préstamos vencidos.");
+            return false;
+        }
+        return true;
+    }
+
+    public void registrarPrestamo(int userId, int materialId) {
+        if (puedePrestar(userId, materialId)) {
+            prestamoDAO.registrarPrestamo(userId, materialId);
+            System.out.println("Préstamo registrado correctamente.");
+        } else {
+            System.out.println("El préstamo no puede ser registrado.");
+        }
+    }
+
+
+
+}

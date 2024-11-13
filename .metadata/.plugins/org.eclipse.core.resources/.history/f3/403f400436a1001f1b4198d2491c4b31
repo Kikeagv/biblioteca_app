@@ -1,0 +1,82 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.service.PrestamoService;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.util.List;
+import java.util.Map;
+
+public class VerPrestamosUI {
+    private PrestamoService prestamoService = new PrestamoService();
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Préstamos Actuales");
+        frame.setSize(700, 400); // Increased width to accommodate the mora column
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        frame.add(panel);
+
+        colocarComponentes(panel);
+
+        frame.setVisible(true);
+    }
+
+    private void colocarComponentes(JPanel panel) {
+        JLabel lblTitulo = new JLabel("Préstamos Pendientes");
+        lblTitulo.setBounds(20, 10, 200, 25);
+        panel.add(lblTitulo);
+
+        JLabel lblUsuario = new JLabel("Usuario:");
+        lblUsuario.setBounds(20, 40, 100, 25);
+        panel.add(lblUsuario);
+
+        JTextField txtUsuario = new JTextField(20);
+        txtUsuario.setBounds(80, 40, 200, 25);
+        panel.add(txtUsuario);
+
+        JButton btnBuscar = new JButton("Buscar");
+        btnBuscar.setBounds(300, 40, 100, 25);
+        panel.add(btnBuscar);
+
+        JTable table = new JTable();
+        table.setBounds(20, 80, 640, 260);
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBounds(20, 80, 640, 260);
+        panel.add(scrollPane);
+
+        // Load all outstanding loans at startup
+        cargarPrestamos(table, null);
+
+        // Search loans by user when the search button is clicked
+        btnBuscar.addActionListener(e -> {
+            String username = txtUsuario.getText().trim();
+            cargarPrestamos(table, username.isEmpty() ? null : username);
+        });
+    }
+
+    private void cargarPrestamos(JTable table, String username) {
+        List<Map<String, String>> prestamos = prestamoService.obtenerPrestamosPendientesConMora(username);
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Usuario");
+        model.addColumn("Material");
+        model.addColumn("Fecha Préstamo");
+        model.addColumn("Mora Acumulada");
+
+        for (Map<String, String> prestamo : prestamos) {
+            model.addRow(new Object[]{
+                    prestamo.get("id"),
+                    prestamo.get("usuario"),
+                    prestamo.get("material"),
+                    prestamo.get("fecha_prestamo"),
+                    prestamo.get("mora_acumulada")
+            });
+        }
+
+        table.setModel(model);
+    }
+}

@@ -1,0 +1,103 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.dao.EjemplarDAO;
+
+import javax.swing.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class EjemplaresUI {
+    private EjemplarDAO ejemplarDAO = new EjemplarDAO();
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Gestión de Ejemplares");
+        frame.setSize(600, 500);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        frame.add(panel);
+        colocarComponentes(panel);
+
+        frame.setVisible(true);
+    }
+
+    private void colocarComponentes(JPanel panel) {
+        panel.setLayout(null);
+
+        JLabel lblTitulo = new JLabel("Título:");
+        lblTitulo.setBounds(20, 20, 100, 25);
+        panel.add(lblTitulo);
+
+        JTextField txtTitulo = new JTextField(20);
+        txtTitulo.setBounds(120, 20, 200, 25);
+        panel.add(txtTitulo);
+
+        JLabel lblCodigoInterno = new JLabel("Código Interno:");
+        lblCodigoInterno.setBounds(20, 60, 100, 25);
+        panel.add(lblCodigoInterno);
+
+        JTextField txtCodigoInterno = new JTextField(20);
+        txtCodigoInterno.setBounds(120, 60, 200, 25);
+        panel.add(txtCodigoInterno);
+
+        JLabel lblCantidad = new JLabel("Cantidad:");
+        lblCantidad.setBounds(20, 100, 100, 25);
+        panel.add(lblCantidad);
+
+        JTextField txtCantidad = new JTextField(20);
+        txtCantidad.setBounds(120, 100, 200, 25);
+        panel.add(txtCantidad);
+
+        JLabel lblUbicacion = new JLabel("Ubicación:");
+        lblUbicacion.setBounds(20, 140, 100, 25);
+        panel.add(lblUbicacion);
+
+        JTextField txtUbicacion = new JTextField(20);
+        txtUbicacion.setBounds(120, 140, 200, 25);
+        panel.add(txtUbicacion);
+
+        JButton btnRegistrar = new JButton("Registrar Ejemplar");
+        btnRegistrar.setBounds(120, 180, 200, 25);
+        panel.add(btnRegistrar);
+
+        btnRegistrar.addActionListener(e -> {
+            try {
+                String titulo = txtTitulo.getText();
+                String codigoInterno = txtCodigoInterno.getText();
+                int cantidad = Integer.parseInt(txtCantidad.getText());
+                String ubicacion = txtUbicacion.getText();
+
+                if (titulo.isEmpty() || codigoInterno.isEmpty() || ubicacion.isEmpty()) {
+                    JOptionPane.showMessageDialog(panel, "Todos los campos son obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Using the new method with an empty map for specific details
+                Map<String, String> detallesEspecificos = new HashMap<>();
+                ejemplarDAO.registrarEjemplarConDetalles("Otro", titulo, codigoInterno, cantidad, ubicacion, detallesEspecificos);
+
+                JOptionPane.showMessageDialog(panel, "Ejemplar registrado correctamente.");
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(panel, "Por favor, ingrese un valor numérico válido para la cantidad.", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(panel, "Error al registrar el ejemplar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        JButton btnConsultar = new JButton("Consultar Ejemplares");
+        btnConsultar.setBounds(120, 220, 200, 25);
+        panel.add(btnConsultar);
+
+        btnConsultar.addActionListener(e -> {
+            List<String[]> ejemplares = ejemplarDAO.consultarEjemplares();
+            StringBuilder resultado = new StringBuilder();
+
+            for (String[] ejemplar : ejemplares) {
+                resultado.append(String.join(", ", ejemplar)).append("\n");
+            }
+
+            JOptionPane.showMessageDialog(panel, resultado.toString());
+        });
+    }
+}

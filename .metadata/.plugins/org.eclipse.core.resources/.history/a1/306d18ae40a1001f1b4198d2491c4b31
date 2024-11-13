@@ -1,0 +1,52 @@
+package com.biblioteca.ui;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class PrestamosUI {
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Gestión de Préstamos");
+        frame.setSize(400, 250);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setResizable(false);
+
+        // Main panel with BoxLayout
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        frame.add(mainPanel);
+
+        // Title
+        JLabel lblTitulo = new JLabel("Gestión de Préstamos", SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 22));
+        lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblTitulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        mainPanel.add(lblTitulo);
+
+        // Buttons
+        JButton btnHacerPrestamo = new JButton("Hacer préstamo de material");
+        JButton btnVerPrestamos = new JButton("Ver préstamos actuales");
+
+        estilizarBoton(btnHacerPrestamo);
+        estilizarBoton(btnVerPrestamos);
+
+        btnHacerPrestamo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnVerPrestamos.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        mainPanel.add(btnHacerPrestamo);
+        mainPanel.add(Box.createVerticalStrut(20)); // Add spacing between buttons
+        mainPanel.add(btnVerPrestamos);
+
+        // Button actions
+        btnHacerPrestamo.addActionListener(e -> new HacerPrestamoUI().mostrarVentana());
+        btnVerPrestamos.addActionListener(e -> new VerPrestamosUI().mostrarVentana());
+
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    private void estilizarBoton(JButton boton) {
+        boton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        boton.setFocusPainted(false);
+    }
+}

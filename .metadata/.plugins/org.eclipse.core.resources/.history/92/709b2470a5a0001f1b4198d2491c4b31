@@ -1,0 +1,180 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.dao.EjemplarDAO;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class AgregarMaterialUI {
+    private EjemplarDAO ejemplarDAO = new EjemplarDAO();
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Agregar Nuevo Material");
+        frame.setSize(600, 500);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+        frame.setResizable(false);
+
+        // Título
+        JLabel titulo = new JLabel("Agregar Nuevo Material", SwingConstants.CENTER);
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 22));
+        titulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        frame.add(titulo, BorderLayout.NORTH);
+
+        // Panel del formulario principal
+        JPanel panelFormulario = new JPanel();
+        panelFormulario.setLayout(new BoxLayout(panelFormulario, BoxLayout.Y_AXIS));
+        panelFormulario.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+
+        // Campo de selección del tipo de material
+        JPanel panelTipo = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel lblTipo = new JLabel("Tipo de Material:");
+        lblTipo.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        JComboBox<String> comboTipo = new JComboBox<>(new String[]{"Libro", "Revista", "Artículo", "Otro"});
+        comboTipo.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        panelTipo.add(lblTipo);
+        panelTipo.add(comboTipo);
+        panelFormulario.add(panelTipo);
+
+        // Campos comunes
+        JTextField txtTitulo = new JTextField();
+        JTextField txtAutor = new JTextField();
+        JTextField txtCantidad = new JTextField();
+        JTextField txtUbicacion = new JTextField();
+
+        JPanel panelCamposComunes = crearCamposComunes(txtTitulo, txtAutor, txtCantidad, txtUbicacion);
+        panelFormulario.add(panelCamposComunes);
+
+        // Panel para campos específicos
+        JPanel panelCamposEspecificos = new JPanel();
+        panelCamposEspecificos.setLayout(new BoxLayout(panelCamposEspecificos, BoxLayout.Y_AXIS));
+        panelCamposEspecificos.setBorder(BorderFactory.createTitledBorder("Detalles Específicos"));
+        panelFormulario.add(panelCamposEspecificos);
+
+        // Actualizar campos específicos según el tipo seleccionado
+        comboTipo.addActionListener(e -> {
+            panelCamposEspecificos.removeAll();
+            String tipoSeleccionado = (String) comboTipo.getSelectedItem();
+
+            switch (tipoSeleccionado) {
+                case "Libro":
+                    agregarCamposLibro(panelCamposEspecificos);
+                    break;
+                case "Revista":
+                    agregarCamposRevista(panelCamposEspecificos);
+                    break;
+                case "Artículo":
+                    agregarCamposArticulo(panelCamposEspecificos);
+                    break;
+                default:
+                    JLabel lblOtro = new JLabel("No se requieren detalles adicionales.");
+                    lblOtro.setFont(new Font("SansSerif", Font.PLAIN, 14));
+                    panelCamposEspecificos.add(lblOtro);
+            }
+
+            panelCamposEspecificos.revalidate();
+            panelCamposEspecificos.repaint();
+        });
+
+        frame.add(panelFormulario, BorderLayout.CENTER);
+
+        // Panel de botones
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        JButton btnGuardar = new JButton("Guardar");
+        JButton btnCancelar = new JButton("Cancelar");
+
+        estilizarBoton(btnGuardar, new Color(40, 167, 69), Color.WHITE);
+        estilizarBoton(btnCancelar, new Color(220, 53, 69), Color.WHITE);
+
+        panelBotones.add(btnGuardar);
+        panelBotones.add(btnCancelar);
+        frame.add(panelBotones, BorderLayout.SOUTH);
+
+        // Evento Guardar
+        btnGuardar.addActionListener(e -> {
+            try {
+                String tipoMaterial = (String) comboTipo.getSelectedItem();
+                String titulo = txtTitulo.getText();
+                String autor = txtAutor.getText();
+                int cantidad = Integer.parseInt(txtCantidad.getText());
+                String ubicacion = txtUbicacion.getText();
+
+                // Aquí podrías añadir lógica para recoger los datos específicos
+                String detallesEspecificos = ""; // Combina los detalles específicos aquí
+
+                ejemplarDAO.registrarEjemplarConDetalles(tipoMaterial, titulo, autor, cantidad, ubicacion, detallesEspecificos);
+                JOptionPane.showMessageDialog(frame, "Material registrado correctamente.");
+                frame.dispose();
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(frame, "Por favor, ingrese un valor numérico válido para la cantidad.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        btnCancelar.addActionListener(e -> frame.dispose());
+
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    private JPanel crearCamposComunes(JTextField txtTitulo, JTextField txtAutor, JTextField txtCantidad, JTextField txtUbicacion) {
+        JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
+
+        panel.add(new JLabel("Título:", SwingConstants.RIGHT));
+        panel.add(txtTitulo);
+
+        panel.add(new JLabel("Autor:", SwingConstants.RIGHT));
+        panel.add(txtAutor);
+
+        panel.add(new JLabel("Cantidad:", SwingConstants.RIGHT));
+        panel.add(txtCantidad);
+
+        panel.add(new JLabel("Ubicación:", SwingConstants.RIGHT));
+        panel.add(txtUbicacion);
+
+        return panel;
+    }
+
+    private void agregarCamposLibro(JPanel panel) {
+        JTextField txtEditorial = new JTextField();
+        JTextField txtISBN = new JTextField();
+
+        panel.add(new JLabel("Editorial:"));
+        panel.add(txtEditorial);
+
+        panel.add(new JLabel("ISBN:"));
+        panel.add(txtISBN);
+    }
+
+    private void agregarCamposRevista(JPanel panel) {
+        JTextField txtPeriodicidad = new JTextField();
+        JTextField txtISSN = new JTextField();
+
+        panel.add(new JLabel("Periodicidad:"));
+        panel.add(txtPeriodicidad);
+
+        panel.add(new JLabel("ISSN:"));
+        panel.add(txtISSN);
+    }
+
+    private void agregarCamposArticulo(JPanel panel) {
+        JTextField txtRevistaPublicacion = new JTextField();
+        JTextField txtDOI = new JTextField();
+
+        panel.add(new JLabel("Revista de Publicación:"));
+        panel.add(txtRevistaPublicacion);
+
+        panel.add(new JLabel("DOI:"));
+        panel.add(txtDOI);
+    }
+
+    private void estilizarBoton(JButton boton, Color bgColor, Color fgColor) {
+        boton.setBackground(bgColor);
+        boton.setForeground(fgColor);
+        boton.setFocusPainted(false);
+        boton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        boton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(bgColor.darker(), 1),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)
+        ));
+    }
+}

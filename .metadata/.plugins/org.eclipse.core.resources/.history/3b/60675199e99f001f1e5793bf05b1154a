@@ -1,0 +1,182 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.service.UsuarioService;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.util.List;
+
+public class GestionUsuariosUI {
+    private UsuarioService usuarioService = new UsuarioService();
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Gestión de Usuarios");
+        frame.setSize(400, 250);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+        frame.setResizable(false);
+
+        JLabel titulo = new JLabel("Gestión de Usuarios", SwingConstants.CENTER);
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 22));
+        titulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        frame.add(titulo, BorderLayout.NORTH);
+
+        JPanel panelBotones = new JPanel(new GridLayout(2, 1, 20, 20));
+        JButton btnAgregarUsuario = new JButton("Agregar Usuario Nuevo");
+        JButton btnListarUsuarios = new JButton("Listar Usuarios");
+
+        estilizarBoton(btnAgregarUsuario, new Color(59, 89, 182), Color.WHITE);
+        estilizarBoton(btnListarUsuarios, new Color(59, 89, 182), Color.WHITE);
+
+        panelBotones.add(btnAgregarUsuario);
+        panelBotones.add(btnListarUsuarios);
+        panelBotones.setBorder(BorderFactory.createEmptyBorder(0, 50, 20, 50));
+        frame.add(panelBotones, BorderLayout.CENTER);
+
+        btnAgregarUsuario.addActionListener(e -> {
+            frame.dispose();
+            new AgregarUsuarioUI().mostrarVentana();
+        });
+
+        btnListarUsuarios.addActionListener(e -> {
+            frame.dispose();
+            new ListarUsuariosUI().mostrarVentana();
+        });
+
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    private void estilizarBoton(JButton boton, Color bgColor, Color fgColor) {
+        boton.setBackground(bgColor);
+        boton.setForeground(fgColor);
+        boton.setFocusPainted(false);
+        boton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        boton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(bgColor.darker(), 1),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)
+        ));
+    }
+
+    private void actualizarTablaUsuarios(DefaultTableModel modeloTabla) {
+        modeloTabla.setRowCount(0); // Limpiar la tabla
+        List<String[]> usuarios = usuarioService.obtenerUsuarios();
+        for (String[] usuario : usuarios) {
+            modeloTabla.addRow(usuario);
+        }
+    }
+
+    private void mostrarFormularioAgregarUsuario(JFrame parentFrame, DefaultTableModel modeloTabla) {
+        JFrame frame = new JFrame("Agregar Usuario");
+        frame.setSize(400, 400);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel(new GridLayout(6, 2, 10, 10));
+        frame.add(panel);
+
+        JTextField txtNombre = new JTextField();
+        JTextField txtUsername = new JTextField();
+        JTextField txtCorreo = new JTextField();
+        JPasswordField txtPassword = new JPasswordField();
+        JTextField txtTelefono = new JTextField();
+        JComboBox<String> cmbTipo = new JComboBox<>(new String[]{"Administrador", "Profesor", "Alumno"});
+
+        panel.add(new JLabel("Nombre:"));
+        panel.add(txtNombre);
+        panel.add(new JLabel("Usuario:"));
+        panel.add(txtUsername);
+        panel.add(new JLabel("Correo:"));
+        panel.add(txtCorreo);
+        panel.add(new JLabel("Contraseña:"));
+        panel.add(txtPassword);
+        panel.add(new JLabel("Teléfono:"));
+        panel.add(txtTelefono);
+        panel.add(new JLabel("Tipo:"));
+        panel.add(cmbTipo);
+
+        JButton btnGuardar = new JButton("Guardar");
+        panel.add(btnGuardar);
+        JButton btnCancelar = new JButton("Cancelar");
+        panel.add(btnCancelar);
+
+        btnGuardar.addActionListener(e -> {
+            String nombre = txtNombre.getText();
+            String username = txtUsername.getText();
+            String correo = txtCorreo.getText();
+            String password = new String(txtPassword.getPassword());
+            String telefono = txtTelefono.getText();
+            String tipo = (String) cmbTipo.getSelectedItem();
+
+            usuarioService.registrarUsuario(nombre, username, password, correo, telefono, tipo);
+            JOptionPane.showMessageDialog(frame, "Usuario agregado correctamente.");
+            frame.dispose();
+            actualizarTablaUsuarios(modeloTabla);
+        });
+
+        btnCancelar.addActionListener(e -> frame.dispose());
+
+        frame.setVisible(true);
+    }
+
+    private void mostrarFormularioCambiarContraseña(JFrame parentFrame, String username) {
+        // Crear el diálogo modal
+        JDialog dialog = new JDialog(parentFrame, "Cambiar Contraseña", true);
+        dialog.setSize(400, 200);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setLayout(new BorderLayout());
+        dialog.setResizable(false); // No permitir redimensionar
+        dialog.getContentPane().setBackground(Color.WHITE);
+
+        // Título
+        JLabel lblTitulo = new JLabel("Nueva Contraseña", SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 18));
+        lblTitulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
+        dialog.add(lblTitulo, BorderLayout.NORTH);
+
+        // Centro: Formulario
+        JPanel panelCentro = new JPanel(new GridLayout(2, 1, 10, 10));
+        panelCentro.setBackground(Color.WHITE);
+        panelCentro.setBorder(BorderFactory.createEmptyBorder(10, 50, 10, 50));
+
+        JLabel lblContraseña = new JLabel("Contraseña:");
+        lblContraseña.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        lblContraseña.setHorizontalAlignment(SwingConstants.LEFT);
+
+        JPasswordField txtNuevaContrasena = new JPasswordField();
+        txtNuevaContrasena.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        txtNuevaContrasena.setPreferredSize(new Dimension(200, 30)); // Altura ajustada
+
+        panelCentro.add(lblContraseña);
+        panelCentro.add(txtNuevaContrasena);
+
+        dialog.add(panelCentro, BorderLayout.CENTER);
+
+        // Sur: Botón Guardar
+        JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        panelSur.setBackground(Color.WHITE);
+
+        JButton btnGuardar = new JButton("Guardar");
+        estilizarBoton(btnGuardar, new Color(40, 167, 69), Color.WHITE);
+
+        panelSur.add(btnGuardar);
+        dialog.add(panelSur, BorderLayout.SOUTH);
+
+        // Acción del botón "Guardar"
+        btnGuardar.addActionListener(e -> {
+            String nuevaContrasena = new String(txtNuevaContrasena.getPassword());
+            if (!nuevaContrasena.isEmpty()) {
+                usuarioService.actualizarContrasena(username, nuevaContrasena);
+                JOptionPane.showMessageDialog(dialog, "Contraseña actualizada correctamente.");
+                dialog.dispose();
+            } else {
+                JOptionPane.showMessageDialog(dialog, "La contraseña no puede estar vacía.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // Mostrar la ventana centrada
+        dialog.setLocationRelativeTo(parentFrame);
+        dialog.setVisible(true);
+    }
+
+}

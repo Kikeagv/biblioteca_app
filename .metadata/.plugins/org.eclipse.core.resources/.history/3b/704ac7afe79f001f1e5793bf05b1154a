@@ -1,0 +1,65 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.service.UsuarioService;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class AgregarUsuarioUI {
+    private UsuarioService usuarioService = new UsuarioService();
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Agregar Usuario Nuevo");
+        frame.setSize(400, 400);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel(new GridLayout(6, 2, 10, 10));
+        frame.add(panel);
+
+        JTextField txtNombre = new JTextField();
+        JTextField txtUsername = new JTextField();
+        JTextField txtCorreo = new JTextField();
+        JPasswordField txtPassword = new JPasswordField();
+        JTextField txtTelefono = new JTextField();
+        JComboBox<String> cmbTipo = new JComboBox<>(new String[]{"Administrador", "Profesor", "Alumno"});
+
+        panel.add(new JLabel("Nombre:"));
+        panel.add(txtNombre);
+        panel.add(new JLabel("Usuario:"));
+        panel.add(txtUsername);
+        panel.add(new JLabel("Correo:"));
+        panel.add(txtCorreo);
+        panel.add(new JLabel("Contraseña:"));
+        panel.add(txtPassword);
+        panel.add(new JLabel("Teléfono:"));
+        panel.add(txtTelefono);
+        panel.add(new JLabel("Tipo:"));
+        panel.add(cmbTipo);
+
+        JButton btnGuardar = new JButton("Guardar");
+        panel.add(btnGuardar);
+        JButton btnCancelar = new JButton("Cancelar");
+        panel.add(btnCancelar);
+
+        btnGuardar.addActionListener(e -> {
+            String nombre = txtNombre.getText();
+            String username = txtUsername.getText();
+            String correo = txtCorreo.getText();
+            String password = new String(txtPassword.getPassword());
+            String telefono = txtTelefono.getText();
+            String tipo = (String) cmbTipo.getSelectedItem();
+
+            usuarioService.registrarUsuario(nombre, username, password, correo, telefono, tipo);
+            JOptionPane.showMessageDialog(frame, "Usuario agregado correctamente.");
+            frame.dispose();
+            new GestionUsuariosUI().mostrarVentana();
+        });
+
+        btnCancelar.addActionListener(e -> {
+            frame.dispose();
+            new GestionUsuariosUI().mostrarVentana();
+        });
+
+        frame.setVisible(true);
+    }
+}

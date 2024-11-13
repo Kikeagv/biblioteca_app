@@ -1,0 +1,116 @@
+package com.biblioteca.service;
+
+import com.biblioteca.dao.PrestamoDAO;
+import com.biblioteca.dao.UsuarioDAO;
+import com.biblioteca.dao.EjemplarDAO;
+
+import java.util.List;
+import java.util.Map;
+
+public class PrestamoService {
+
+    private PrestamoDAO prestamoDAO = new PrestamoDAO();
+    private UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private EjemplarDAO ejemplarDAO = new EjemplarDAO();
+
+    /**
+     * Validates if a user can borrow a material based on their status, material availability, and loan limits.
+     *
+     * @param userId       User ID attempting to borrow.
+     * @param materialId   Material ID being borrowed.
+     * @param tipoMaterial Type of material being borrowed.
+     * @return true if the loan can proceed; false otherwise.
+     */
+    public boolean puedePrestar(int userId, int materialId, String tipoMaterial) {
+        if (prestamoDAO.tienePrestamosDefaulter(userId)) {
+            System.out.println("El usuario tiene préstamos vencidos.");
+            return false;
+        }
+
+        if (!prestamoDAO.validarDisponibilidadMaterial(materialId)) {
+            System.out.println("El material no está disponible.");
+            return false;
+        }
+
+        if (!prestamoDAO.validarLimitePrestamos(userId, tipoMaterial)) {
+            System.out.println("El usuario alcanzó el límite de préstamos para este tipo de material.");
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Registers a new loan for a user after passing all validations.
+     *
+     * @param userId       User ID borrowing the material.
+     * @param materialId   Material ID being borrowed.
+     * @param tipoMaterial Type of material being borrowed.
+     */
+    public void registrarPrestamo(int userId, int materialId, String tipoMaterial) {
+        if (puedePrestar(userId, materialId, tipoMaterial)) {
+            prestamoDAO.registrarPrestamo(userId, materialId);
+            System.out.println("Préstamo registrado correctamente.");
+        } else {
+            System.out.println("El préstamo no pudo ser registrado.");
+        }
+    }
+
+    /**
+     * Registers the return of a borrowed material and calculates overdue penalties if applicable.
+     *
+     * @param prestamoId ID of the loan being returned.
+     * @param tasaDiaria Daily penalty rate for overdue loans.
+     */
+    public void registrarDevolucion(int prestamoId, double tasaDiaria) {
+        double mora = prestamoDAO.calcularMora(prestamoId, tasaDiaria);
+        prestamoDAO.registrarDevolucion(prestamoId);
+
+        if (mora > 0) {
+            prestamoDAO.registrarMora(prestamoId, mora);
+            System.out.println("Mora registrada: $" + mora);
+        } else {
+            System.out.println("Devolución registrada sin mora.");
+        }
+    }
+
+    /**
+     * Retrieves active loans for a specific user.
+     *
+     * @param userId ID of the user.
+     * @return List of active loans.
+     */
+    public List<Map<String, String>> obtenerPrestamosActivos(int userId) {
+        return prestamoDAO.obtenerPrestamosActivos(userId);
+    }
+
+    /**
+     * Retrieves all loans in the system.
+     *
+     * @return List of all loans.
+     */
+    public List<Map<String, String>> obtenerTodosPrestamos() {
+        return prestamoDAO.obtenerTodosPrestamos();
+    }
+
+    /**
+     * Retrieves overdue loans for a specific user.
+     *
+     * @param userId ID of the user.
+     * @return List of overdue loans.
+     */
+    public List<Map<String, String>> obtenerPrestamosPendientesConMora(int userId) {
+        return prestamoDAO.obtenerPrestamosPendientesConMora(userId);
+    }
+
+    /**
+     * Adds penalties to an overdue loan.
+     *
+     * @param prestamoId  ID of the loan.
+     * @param montoDiario Daily penalty amount.
+     */
+    public void agregarMora(int prestamoId, double montoDiario) {
+        prestamoDAO.agregarMora(prestamoId, montoDiario);
+        System.out.println("Mora agregada correctamente.");
+    }
+}

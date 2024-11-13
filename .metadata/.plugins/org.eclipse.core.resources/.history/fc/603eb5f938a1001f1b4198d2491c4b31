@@ -1,0 +1,46 @@
+package com.biblioteca.ui;
+
+import javax.swing.*;
+
+public class MainUI {
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Sistema Biblioteca - Menú Principal");
+        frame.setSize(600, 400);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        frame.add(panel);
+        colocarComponentes(panel);
+
+        frame.setVisible(true);
+    }
+
+    private static void colocarComponentes(JPanel panel) {
+        panel.setLayout(null);
+
+        JLabel title = new JLabel("Menú Principal");
+        title.setBounds(220, 20, 200, 30);
+        panel.add(title);
+
+        JButton btnGestionUsuarios = new JButton("Gestión de Usuarios");
+        btnGestionUsuarios.setBounds(200, 100, 200, 30);
+        panel.add(btnGestionUsuarios);
+
+        btnGestionUsuarios.addActionListener(e -> new GestionUsuariosUI().mostrarVentana());
+        
+        JButton btnGestionMateriales = new JButton("Gestión de Materiales");
+        btnGestionMateriales.setBounds(200, 150, 200, 30);
+        panel.add(btnGestionMateriales);
+
+        btnGestionMateriales.addActionListener(e -> new GestionMaterialesUI().mostrarVentana());
+
+        // Add the "Prestamos" button
+        JButton btnPrestamos = new JButton("Gestión de Préstamos");
+        btnPrestamos.setBounds(200, 200, 200, 30);
+        panel.add(btnPrestamos);
+
+        // Action listener for opening PrestamosUI
+        btnPrestamos.addActionListener(e -> new PrestamosUI().mostrarVentana());
+    }
+}

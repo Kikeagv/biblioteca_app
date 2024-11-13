@@ -1,0 +1,49 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.service.UsuarioService;
+
+import javax.swing.*;
+
+public class CambiarContrasenaUI {
+
+    private UsuarioService usuarioService = new UsuarioService();
+    private String username;
+
+    public CambiarContrasenaUI(String username) {
+        this.username = username;
+    }
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Cambiar Contraseña");
+        frame.setSize(400, 200);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        frame.add(panel);
+
+        JLabel lblUsuario = new JLabel("Usuario: " + username);
+        lblUsuario.setBounds(20, 20, 200, 25);
+        panel.add(lblUsuario);
+
+        JLabel lblNuevaContrasena = new JLabel("Nueva Contraseña:");
+        lblNuevaContrasena.setBounds(20, 60, 150, 25);
+        panel.add(lblNuevaContrasena);
+
+        JPasswordField txtNuevaContrasena = new JPasswordField(20);
+        txtNuevaContrasena.setBounds(150, 60, 200, 25);
+        panel.add(txtNuevaContrasena);
+
+        JButton btnActualizar = new JButton("Actualizar");
+        btnActualizar.setBounds(150, 100, 100, 25);
+        panel.add(btnActualizar);
+
+        btnActualizar.addActionListener(e -> {
+            String nuevaContrasena = new String(txtNuevaContrasena.getPassword());
+            usuarioService.actualizarContrasena(username, nuevaContrasena);
+            JOptionPane.showMessageDialog(panel, "Contraseña actualizada correctamente.");
+        });
+
+        frame.setVisible(true);
+    }
+}

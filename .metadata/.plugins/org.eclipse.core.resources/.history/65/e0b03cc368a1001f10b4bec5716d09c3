@@ -1,0 +1,89 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.service.PrestamoService;
+import com.biblioteca.dao.UsuarioDAO;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
+
+public class HacerPrestamoUI {
+    private PrestamoService prestamoService = new PrestamoService();
+    private UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private int materialId;
+
+    public HacerPrestamoUI(int materialId) {
+        this.materialId = materialId;
+    }
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Registrar Préstamo");
+        frame.setSize(500, 400);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+
+        JLabel titulo = new JLabel("Registrar Préstamo", SwingConstants.CENTER);
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 22));
+        titulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        frame.add(titulo, BorderLayout.NORTH);
+
+        JPanel panelCentral = new JPanel(new BorderLayout());
+        JLabel lblUsuarios = new JLabel("Seleccione un usuario:");
+        lblUsuarios.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        panelCentral.add(lblUsuarios, BorderLayout.NORTH);
+
+        JComboBox<String> cmbUsuarios = new JComboBox<>();
+        panelCentral.add(cmbUsuarios, BorderLayout.CENTER);
+
+        List<String[]> usuarios = usuarioDAO.obtenerUsuariosSinAtrasos();
+        for (String[] usuario : usuarios) {
+            cmbUsuarios.addItem(usuario[1] + " - " + usuario[2]); // Nombre - Usuario
+        }
+
+        frame.add(panelCentral, BorderLayout.CENTER);
+
+        JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton btnPrestar = new JButton("Registrar Préstamo");
+        JButton btnCancelar = new JButton("Cancelar");
+
+        estilizarBoton(btnPrestar, new Color(40, 167, 69), Color.WHITE);
+        estilizarBoton(btnCancelar, new Color(220, 53, 69), Color.WHITE);
+
+        panelInferior.add(btnPrestar);
+        panelInferior.add(btnCancelar);
+        frame.add(panelInferior, BorderLayout.SOUTH);
+
+        btnPrestar.addActionListener(e -> {
+            int selectedIndex = cmbUsuarios.getSelectedIndex();
+            if (selectedIndex == -1) {
+                JOptionPane.showMessageDialog(panel, "Debe seleccionar un usuario.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try {
+                int userId = Integer.parseInt(usuarios.get(selectedIndex)[0]); // Extract user ID
+                prestamoService.registrarPrestamo(userId, materialId); // Pass user ID and material ID
+                JOptionPane.showMessageDialog(panel, "Préstamo registrado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                frame.dispose(); // Close the window
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(panel, "Error al registrar el préstamo: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        btnCancelar.addActionListener(e -> frame.dispose());
+
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    private void estilizarBoton(JButton boton, Color bgColor, Color fgColor) {
+        boton.setBackground(bgColor);
+        boton.setForeground(fgColor);
+        boton.setFocusPainted(false);
+        boton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        boton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(bgColor.darker(), 1),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)
+        ));
+    }
+}

@@ -1,0 +1,65 @@
+package com.biblioteca.ui;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class GestionPrestamosUI {
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Gestión de Préstamos");
+        frame.setSize(400, 250);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setResizable(false);
+
+        // Main panel with BoxLayout
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        frame.add(mainPanel);
+
+        // Title
+        JLabel titulo = new JLabel("Gestión de Préstamos", SwingConstants.CENTER);
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 22));
+        titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        mainPanel.add(titulo);
+
+        // Buttons
+        JButton btnHacerPrestamo = new JButton("Hacer préstamo de material");
+        JButton btnVerPrestamos = new JButton("Ver préstamos actuales");
+
+        estilizarBoton(btnHacerPrestamo, new Color(59, 89, 182), Color.WHITE);
+        estilizarBoton(btnVerPrestamos, new Color(59, 89, 182), Color.WHITE);
+
+        btnHacerPrestamo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnVerPrestamos.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        mainPanel.add(btnHacerPrestamo);
+        mainPanel.add(Box.createVerticalStrut(20)); // Add spacing between buttons
+        mainPanel.add(btnVerPrestamos);
+
+        // Button actions
+        btnHacerPrestamo.addActionListener(e -> {
+            frame.dispose();
+            new HacerPrestamoUI().mostrarVentana();
+        });
+
+        btnVerPrestamos.addActionListener(e -> {
+            frame.dispose();
+            new VerPrestamosUI().mostrarVentana();
+        });
+
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    private void estilizarBoton(JButton boton, Color bgColor, Color fgColor) {
+        boton.setBackground(bgColor);
+        boton.setForeground(fgColor);
+        boton.setFocusPainted(false);
+        boton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        boton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(bgColor.darker(), 1),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)
+        ));
+    }
+}

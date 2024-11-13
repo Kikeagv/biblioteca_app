@@ -1,0 +1,76 @@
+package com.biblioteca.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.biblioteca.conexion.ConexionBD;
+
+public class PrestamoDAO {
+
+    // Método para verificar si un usuario tiene mora activa
+    public boolean tieneMora(String username) {
+        String sql = "SELECT mora FROM prestamos WHERE username = ? AND devuelto = false";
+        try (Connection con = ConexionBD.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    double mora = rs.getDouble("mora");
+                    return mora > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Método para registrar un préstamo
+    public void registrarPrestamo(String username, int ejemplarId) {
+        String sql = "INSERT INTO prestamos (username, ejemplar_id, fecha_prestamo) VALUES (?, ?, NOW())";
+        try (Connection con = ConexionBD.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ps.setInt(2, ejemplarId);
+            ps.executeUpdate();
+            System.out.println("Préstamo registrado correctamente.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Método para registrar la devolución de un préstamo
+    public void registrarDevolucion(int prestamoId) {
+        String sql = "UPDATE prestamos SET devuelto = true, fecha_devolucion = NOW() WHERE id = ?";
+        try (Connection con = ConexionBD.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, prestamoId);
+            ps.executeUpdate();
+            System.out.println("Devolución registrada correctamente.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Método para listar los préstamos activos de un usuario
+    public List<String> listarPrestamosActivos(String username) {
+        String sql = "SELECT ejemplar_id FROM prestamos WHERE username = ? AND devuelto = false";
+        List<String> prestamos = new ArrayList<>();
+        try (Connection con = ConexionBD.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    prestamos.add("Ejemplar ID: " + rs.getInt("ejemplar_id"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return prestamos;
+    }
+}

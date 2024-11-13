@@ -1,0 +1,64 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.service.PrestamoService;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.util.List;
+import java.util.Map;
+
+public class VerPrestamosUI {
+    private PrestamoService prestamoService = new PrestamoService();
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Préstamos Actuales");
+        frame.setSize(600, 400);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        frame.add(panel);
+
+        colocarComponentes(panel);
+
+        frame.setVisible(true);
+    }
+
+    private void colocarComponentes(JPanel panel) {
+        JLabel lblTitulo = new JLabel("Préstamos Actuales");
+        lblTitulo.setBounds(20, 10, 200, 25);
+        panel.add(lblTitulo);
+
+        JTable table = new JTable();
+        table.setBounds(20, 50, 540, 300);
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBounds(20, 50, 540, 300);
+        panel.add(scrollPane);
+
+        // Load all loans at startup
+        cargarPrestamos(table);
+    }
+
+    private void cargarPrestamos(JTable table) {
+        List<Map<String, String>> prestamos = prestamoService.obtenerTodosPrestamos();
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Usuario");
+        model.addColumn("Material");
+        model.addColumn("Fecha Préstamo");
+        model.addColumn("Estado");
+
+        for (Map<String, String> prestamo : prestamos) {
+            model.addRow(new Object[]{
+                    prestamo.get("id"),
+                    prestamo.get("usuario"),
+                    prestamo.get("material"),
+                    prestamo.get("fecha_prestamo"),
+                    prestamo.get("estado")
+            });
+        }
+
+        table.setModel(model);
+    }
+}

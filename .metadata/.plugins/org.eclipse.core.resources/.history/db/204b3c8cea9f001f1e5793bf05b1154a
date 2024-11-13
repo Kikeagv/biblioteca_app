@@ -1,0 +1,72 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.service.UsuarioService;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class LoginUI {
+    private UsuarioService usuarioService = new UsuarioService();
+
+    public void mostrarLogin() {
+        JFrame frame = new JFrame("Sistema Biblioteca - Login");
+        frame.setSize(400, 300);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        frame.add(panel);
+        colocarComponentes(panel, frame);
+
+        frame.setVisible(true);
+    }
+
+    private void colocarComponentes(JPanel panel, JFrame frame) {
+        panel.setLayout(null);
+
+        JLabel usuarioLabel = new JLabel("Usuario:");
+        usuarioLabel.setBounds(10, 20, 80, 25);
+        panel.add(usuarioLabel);
+
+        JTextField usuarioText = new JTextField(20);
+        usuarioText.setBounds(100, 20, 165, 25);
+        panel.add(usuarioText);
+
+        JLabel passwordLabel = new JLabel("Contraseña:");
+        passwordLabel.setBounds(10, 50, 80, 25);
+        panel.add(passwordLabel);
+
+        JPasswordField passwordText = new JPasswordField(20);
+        passwordText.setBounds(100, 50, 165, 25);
+        panel.add(passwordText);
+
+        JButton loginButton = new JButton("Login");
+        loginButton.setBounds(10, 80, 80, 25);
+        panel.add(loginButton);
+
+        JButton salirButton = new JButton("Salir");
+        salirButton.setBounds(100, 80, 80, 25);
+        panel.add(salirButton);
+
+        loginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String username = usuarioText.getText();
+                String password = new String(passwordText.getPassword());
+
+                if (usuarioService.login(username, password)) {
+                    JOptionPane.showMessageDialog(panel, "Inicio de sesión exitoso.");
+                    frame.dispose();
+
+                    // Llamada estática corregida
+                    MainUI.main(new String[0]);
+                } else {
+                    JOptionPane.showMessageDialog(panel, "Usuario o contraseña incorrectos.");
+                }
+            }
+        });
+
+
+        salirButton.addActionListener(e -> System.exit(0));
+    }
+}

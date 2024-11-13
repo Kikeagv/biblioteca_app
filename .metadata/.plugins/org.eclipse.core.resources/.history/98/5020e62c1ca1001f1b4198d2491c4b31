@@ -1,0 +1,53 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.service.PrestamoService;
+
+import javax.swing.*;
+
+public class PrestamosUI {
+    private PrestamoService prestamoService = new PrestamoService();
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Gestión de Préstamos");
+        frame.setSize(500, 400);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        frame.add(panel);
+        colocarComponentes(panel);
+
+        frame.setVisible(true);
+    }
+
+    private void colocarComponentes(JPanel panel) {
+        panel.setLayout(null);
+
+        JLabel lblUsuario = new JLabel("Usuario:");
+        lblUsuario.setBounds(20, 20, 100, 25);
+        panel.add(lblUsuario);
+
+        JTextField txtUsuario = new JTextField(20);
+        txtUsuario.setBounds(120, 20, 200, 25);
+        panel.add(txtUsuario);
+
+        JLabel lblEjemplar = new JLabel("ID Ejemplar:");
+        lblEjemplar.setBounds(20, 60, 100, 25);
+        panel.add(lblEjemplar);
+
+        JTextField txtEjemplar = new JTextField(20);
+        txtEjemplar.setBounds(120, 60, 200, 25);
+        panel.add(txtEjemplar);
+
+        JButton btnPrestar = new JButton("Registrar Préstamo");
+        btnPrestar.setBounds(120, 120, 200, 25);
+        panel.add(btnPrestar);
+
+        btnPrestar.addActionListener(e -> {
+            String usuario = txtUsuario.getText();
+            int ejemplarId = Integer.parseInt(txtEjemplar.getText());
+
+            prestamoService.registrarPrestamo(usuario, ejemplarId);
+            JOptionPane.showMessageDialog(panel, "Préstamo registrado correctamente.");
+        });
+    }
+}

@@ -1,0 +1,316 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.dao.EjemplarDAO;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
+
+public class AgregarMaterialUI {
+    private EjemplarDAO ejemplarDAO = new EjemplarDAO();
+    private Map<String, JTextField> camposEspecificos = new HashMap<>();
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Agregar Nuevo Material");
+        frame.setSize(700, 600);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+        frame.setResizable(false);
+
+        // Título
+        JLabel titulo = new JLabel("Agregar Nuevo Material", SwingConstants.CENTER);
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 22));
+        titulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        frame.add(titulo, BorderLayout.NORTH);
+
+        // Panel del formulario principal
+        JPanel panelFormulario = new JPanel();
+        panelFormulario.setLayout(new BoxLayout(panelFormulario, BoxLayout.Y_AXIS));
+        panelFormulario.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+
+        // Campo de selección del tipo de material
+        JPanel panelTipo = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel lblTipo = new JLabel("Tipo de Material:");
+        lblTipo.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        JComboBox<String> comboTipo = new JComboBox<>(new String[]{"Libro", "Revista", "Tesis", "CD", "DVD"});
+        comboTipo.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        panelTipo.add(lblTipo);
+        panelTipo.add(comboTipo);
+        panelFormulario.add(panelTipo);
+
+        // Campos generales
+        JTextField txtTitulo = new JTextField();
+        JTextField txtCodigoInterno = new JTextField();
+        JTextField txtCantidad = new JTextField();
+        JTextField txtUbicacion = new JTextField();
+
+        JPanel panelCamposGenerales = crearCamposGenerales(txtTitulo, txtCodigoInterno, txtCantidad, txtUbicacion);
+        panelFormulario.add(panelCamposGenerales);
+
+        // Panel para campos específicos
+        JPanel panelCamposEspecificos = new JPanel();
+        panelCamposEspecificos.setLayout(new BoxLayout(panelCamposEspecificos, BoxLayout.Y_AXIS));
+        panelCamposEspecificos.setBorder(BorderFactory.createTitledBorder("Detalles Específicos"));
+        panelFormulario.add(panelCamposEspecificos);
+
+        // Actualizar campos específicos según el tipo seleccionado
+        comboTipo.addActionListener(e -> {
+            panelCamposEspecificos.removeAll();
+            camposEspecificos.clear(); // Limpia campos anteriores
+
+            String tipoSeleccionado = (String) comboTipo.getSelectedItem();
+            switch (tipoSeleccionado) {
+                case "Libro":
+                    agregarCamposLibro(panelCamposEspecificos);
+                    break;
+                case "Revista":
+                    agregarCamposRevista(panelCamposEspecificos);
+                    break;
+                case "Tesis":
+                    agregarCamposTesis(panelCamposEspecificos);
+                    break;
+                case "CD":
+                    agregarCamposCD(panelCamposEspecificos);
+                    break;
+                case "DVD":
+                    agregarCamposDVD(panelCamposEspecificos);
+                    break;
+            }
+
+            panelCamposEspecificos.revalidate();
+            panelCamposEspecificos.repaint();
+        });
+
+        frame.add(panelFormulario, BorderLayout.CENTER);
+
+        // Panel de botones
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        JButton btnGuardar = new JButton("Guardar");
+        JButton btnCancelar = new JButton("Cancelar");
+
+        estilizarBoton(btnGuardar, new Color(40, 167, 69), Color.WHITE);
+        estilizarBoton(btnCancelar, new Color(220, 53, 69), Color.WHITE);
+
+        panelBotones.add(btnGuardar);
+        panelBotones.add(btnCancelar);
+        frame.add(panelBotones, BorderLayout.SOUTH);
+
+        // Evento Guardar
+        public void mostrarVentana() {
+            JFrame frame = new JFrame("Agregar Nuevo Material");
+            frame.setSize(600, 600);
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.setLayout(null);
+
+            JLabel lblTipo = new JLabel("Tipo de Material:");
+            lblTipo.setBounds(20, 20, 150, 25);
+            frame.add(lblTipo);
+
+            String[] tiposMaterial = {"Libro", "Revista", "Tesis", "CD", "DVD"};
+            JComboBox<String> comboTipo = new JComboBox<>(tiposMaterial);
+            comboTipo.setBounds(180, 20, 200, 25);
+            frame.add(comboTipo);
+
+            JLabel lblTitulo = new JLabel("Título:");
+            lblTitulo.setBounds(20, 60, 150, 25);
+            frame.add(lblTitulo);
+
+            JTextField txtTitulo = new JTextField();
+            txtTitulo.setBounds(180, 60, 200, 25);
+            frame.add(txtTitulo);
+
+            JLabel lblCodigoInterno = new JLabel("Código Interno:");
+            lblCodigoInterno.setBounds(20, 100, 150, 25);
+            frame.add(lblCodigoInterno);
+
+            JTextField txtCodigoInterno = new JTextField();
+            txtCodigoInterno.setBounds(180, 100, 200, 25);
+            frame.add(txtCodigoInterno);
+
+            JLabel lblCantidad = new JLabel("Cantidad:");
+            lblCantidad.setBounds(20, 140, 150, 25);
+            frame.add(lblCantidad);
+
+            JTextField txtCantidad = new JTextField();
+            txtCantidad.setBounds(180, 140, 200, 25);
+            frame.add(txtCantidad);
+
+            JLabel lblUbicacion = new JLabel("Ubicación:");
+            lblUbicacion.setBounds(20, 180, 150, 25);
+            frame.add(lblUbicacion);
+
+            JTextField txtUbicacion = new JTextField();
+            txtUbicacion.setBounds(180, 180, 200, 25);
+            frame.add(txtUbicacion);
+
+            JLabel lblDetalles = new JLabel("Detalles Específicos");
+            lblDetalles.setBounds(20, 220, 200, 25);
+            frame.add(lblDetalles);
+
+            // Detalles Específicos para Libros
+            JLabel lblAutor = new JLabel("Autor:");
+            lblAutor.setBounds(20, 260, 150, 25);
+            frame.add(lblAutor);
+
+            JTextField txtAutor = new JTextField();
+            txtAutor.setBounds(180, 260, 200, 25);
+            frame.add(txtAutor);
+
+            JLabel lblEditorial = new JLabel("Editorial:");
+            lblEditorial.setBounds(20, 300, 150, 25);
+            frame.add(lblEditorial);
+
+            JTextField txtEditorial = new JTextField();
+            txtEditorial.setBounds(180, 300, 200, 25);
+            frame.add(txtEditorial);
+
+            JLabel lblISBN = new JLabel("ISBN:");
+            lblISBN.setBounds(20, 340, 150, 25);
+            frame.add(lblISBN);
+
+            JTextField txtISBN = new JTextField();
+            txtISBN.setBounds(180, 340, 200, 25);
+            frame.add(txtISBN);
+
+            JLabel lblPaginas = new JLabel("Número de Páginas:");
+            lblPaginas.setBounds(20, 380, 150, 25);
+            frame.add(lblPaginas);
+
+            JTextField txtPaginas = new JTextField();
+            txtPaginas.setBounds(180, 380, 200, 25);
+            frame.add(txtPaginas);
+
+            JLabel lblGenero = new JLabel("Género:");
+            lblGenero.setBounds(20, 420, 150, 25);
+            frame.add(lblGenero);
+
+            JTextField txtGenero = new JTextField();
+            txtGenero.setBounds(180, 420, 200, 25);
+            frame.add(txtGenero);
+
+            JLabel lblAnio = new JLabel("Año de Publicación:");
+            lblAnio.setBounds(20, 460, 150, 25);
+            frame.add(lblAnio);
+
+            JTextField txtAnio = new JTextField();
+            txtAnio.setBounds(180, 460, 200, 25);
+            frame.add(txtAnio);
+
+            JButton btnGuardar = new JButton("Guardar");
+            btnGuardar.setBounds(150, 520, 100, 30);
+            frame.add(btnGuardar);
+
+            JButton btnCancelar = new JButton("Cancelar");
+            btnCancelar.setBounds(270, 520, 100, 30);
+            frame.add(btnCancelar);
+
+            // Evento Guardar
+            btnGuardar.addActionListener(e -> {
+                try {
+                    String tipoMaterial = (String) comboTipo.getSelectedItem();
+                    String titulo = txtTitulo.getText();
+                    String codigoInterno = txtCodigoInterno.getText();
+                    int cantidad = Integer.parseInt(txtCantidad.getText());
+                    String ubicacion = txtUbicacion.getText();
+
+                    Map<String, String> detallesEspecificos = new HashMap<>();
+                    detallesEspecificos.put("Autor", txtAutor.getText());
+                    detallesEspecificos.put("Editorial", txtEditorial.getText());
+                    detallesEspecificos.put("ISBN", txtISBN.getText());
+                    detallesEspecificos.put("Número de Páginas", txtPaginas.getText());
+                    detallesEspecificos.put("Género", txtGenero.getText());
+                    detallesEspecificos.put("Año de Publicación", txtAnio.getText());
+
+                    ejemplarDAO.registrarEjemplarConDetalles(tipoMaterial, titulo, codigoInterno, cantidad, ubicacion, detallesEspecificos);
+                    JOptionPane.showMessageDialog(frame, "Material registrado correctamente.");
+                    frame.dispose();
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frame, "Por favor, ingrese un valor numérico válido para la cantidad o el año de publicación.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            });
+
+            btnCancelar.addActionListener(e -> frame.dispose());
+
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        }
+    }
+
+        btnCancelar.addActionListener(e -> frame.dispose());
+
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    
+
+    private JPanel crearCamposGenerales(JTextField txtTitulo, JTextField txtCodigoInterno, JTextField txtCantidad, JTextField txtUbicacion) {
+        JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
+
+        panel.add(new JLabel("Título:", SwingConstants.RIGHT));
+        panel.add(txtTitulo);
+
+        panel.add(new JLabel("Código Interno:", SwingConstants.RIGHT));
+        panel.add(txtCodigoInterno);
+
+        panel.add(new JLabel("Cantidad:", SwingConstants.RIGHT));
+        panel.add(txtCantidad);
+
+        panel.add(new JLabel("Ubicación:", SwingConstants.RIGHT));
+        panel.add(txtUbicacion);
+
+        return panel;
+    }
+
+    private void agregarCamposLibro(JPanel panel) {
+        agregarCampoEspecifico(panel, "Autor");
+        agregarCampoEspecifico(panel, "Editorial");
+        agregarCampoEspecifico(panel, "ISBN");
+        agregarCampoEspecifico(panel, "Número de Páginas");
+    }
+
+    private void agregarCamposRevista(JPanel panel) {
+        agregarCampoEspecifico(panel, "Editorial");
+        agregarCampoEspecifico(panel, "Periodicidad");
+        agregarCampoEspecifico(panel, "Fecha de Publicación");
+    }
+
+    private void agregarCamposTesis(JPanel panel) {
+        agregarCampoEspecifico(panel, "Autor");
+        agregarCampoEspecifico(panel, "Título de Investigación");
+        agregarCampoEspecifico(panel, "Carrera");
+        agregarCampoEspecifico(panel, "Universidad");
+        agregarCampoEspecifico(panel, "Año de Presentación");
+    }
+
+    private void agregarCamposCD(JPanel panel) {
+        agregarCampoEspecifico(panel, "Artista");
+        agregarCampoEspecifico(panel, "Género");
+        agregarCampoEspecifico(panel, "Duración");
+        agregarCampoEspecifico(panel, "Número de Canciones");
+    }
+
+    private void agregarCamposDVD(JPanel panel) {
+        agregarCampoEspecifico(panel, "Director");
+        agregarCampoEspecifico(panel, "Género");
+        agregarCampoEspecifico(panel, "Duración");
+    }
+
+    private void agregarCampoEspecifico(JPanel panel, String nombreCampo) {
+        JLabel label = new JLabel(nombreCampo + ":");
+        JTextField textField = new JTextField();
+        panel.add(label);
+        panel.add(textField);
+        camposEspecificos.put(nombreCampo, textField);
+    }
+
+    private void estilizarBoton(JButton boton, Color bgColor, Color fgColor) {
+        boton.setBackground(bgColor);
+        boton.setForeground(fgColor);
+        boton.setFocusPainted(false);
+        boton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        boton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(bgColor.darker(), 1),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)
+        ));
+    }
+}

@@ -1,0 +1,102 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.service.UsuarioService;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.util.List;
+
+public class ListarUsuariosUI {
+    private UsuarioService usuarioService = new UsuarioService();
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Listar Usuarios");
+        frame.setSize(800, 500);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+
+        // Título
+        JLabel titulo = new JLabel("Usuarios Registrados", SwingConstants.CENTER);
+        titulo.setFont(new Font("Arial", Font.BOLD, 20));
+        titulo.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
+        frame.add(titulo, BorderLayout.NORTH);
+
+        // Tabla
+        String[] columnas = {"Nombre", "Usuario", "Tipo", "Correo", "Teléfono", "Estado"};
+        DefaultTableModel modeloTabla = new DefaultTableModel(columnas, 0);
+        JTable tablaUsuarios = new JTable(modeloTabla);
+        JScrollPane scrollPane = new JScrollPane(tablaUsuarios);
+        frame.add(scrollPane, BorderLayout.CENTER);
+
+        // Botones
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        JButton btnCambiarContraseña = new JButton("Cambiar Contraseña");
+        JButton btnRegresar = new JButton("Regresar");
+
+        btnCambiarContraseña.setFont(new Font("Arial", Font.PLAIN, 14));
+        btnRegresar.setFont(new Font("Arial", Font.PLAIN, 14));
+
+        panelBotones.add(btnCambiarContraseña);
+        panelBotones.add(btnRegresar);
+        frame.add(panelBotones, BorderLayout.SOUTH);
+
+        // Llenar tabla
+        actualizarTablaUsuarios(modeloTabla);
+
+        // Eventos
+        btnCambiarContraseña.addActionListener(e -> {
+            int filaSeleccionada = tablaUsuarios.getSelectedRow();
+            if (filaSeleccionada != -1) {
+                String username = (String) modeloTabla.getValueAt(filaSeleccionada, 1);
+                mostrarFormularioCambiarContraseña(frame, username);
+            } else {
+                JOptionPane.showMessageDialog(frame, "Seleccione un usuario.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        btnRegresar.addActionListener(e -> {
+            frame.dispose();
+            new GestionUsuariosUI().mostrarVentana();
+        });
+
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    private void actualizarTablaUsuarios(DefaultTableModel modeloTabla) {
+        modeloTabla.setRowCount(0);
+        List<String[]> usuarios = usuarioService.obtenerUsuarios();
+        for (String[] usuario : usuarios) {
+            modeloTabla.addRow(usuario);
+        }
+    }
+
+    private void mostrarFormularioCambiarContraseña(JFrame parentFrame, String username) {
+        JFrame frame = new JFrame("Cambiar Contraseña");
+        frame.setSize(300, 200);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel(new GridLayout(2, 1, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        frame.add(panel);
+
+        panel.add(new JLabel("Nueva Contraseña:"));
+        JPasswordField txtNuevaContrasena = new JPasswordField();
+        panel.add(txtNuevaContrasena);
+
+        JButton btnGuardar = new JButton("Guardar");
+        btnGuardar.setFont(new Font("Arial", Font.PLAIN, 14));
+        frame.add(btnGuardar, BorderLayout.SOUTH);
+
+        btnGuardar.addActionListener(e -> {
+            String nuevaContrasena = new String(txtNuevaContrasena.getPassword());
+            usuarioService.actualizarContrasena(username, nuevaContrasena);
+            JOptionPane.showMessageDialog(frame, "Contraseña actualizada correctamente.");
+            frame.dispose();
+        });
+
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+}

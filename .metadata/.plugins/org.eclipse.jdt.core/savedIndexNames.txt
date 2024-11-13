@@ -1,0 +1,6 @@
+INDEX VERSION 1.134+/home/kike/Desktop/UDB/POO/proyecto_fase_1/.metadata/.plugins/org.eclipse.jdt.core
+2905640177.index
+1865797976.index
+3509629148.index
+3219570184.index
+2054852854.index

@@ -1,0 +1,11 @@
+/**
+ * 
+ */
+/**
+ * 
+ */
+module SistemaBiblioteca {
+    requires java.sql;
+    requires java.desktop;
+    requires import com.toedter.calendar.JDateChooser;;
+}

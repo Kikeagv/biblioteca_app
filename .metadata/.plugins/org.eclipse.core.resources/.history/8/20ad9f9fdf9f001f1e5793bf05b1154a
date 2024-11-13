@@ -1,0 +1,32 @@
+package com.biblioteca.service;
+
+import com.biblioteca.dao.UsuarioDAO;
+
+import java.util.List;
+
+public class UsuarioService {
+
+    private UsuarioDAO usuarioDAO = new UsuarioDAO();
+
+    public boolean login(String username, String password) {
+        boolean esValido = usuarioDAO.validarUsuario(username, password);
+        if (esValido) {
+            System.out.println("Inicio de sesión exitoso para el usuario: " + username);
+        } else {
+            System.out.println("Usuario o contraseña incorrectos.");
+        }
+        return esValido;
+    }
+
+    public void registrarUsuario(String nombre, String username, String password, String correo, String telefono, String tipo, String estado) {
+        usuarioDAO.registrarUsuario(nombre, username, password, correo, telefono, tipo, estado);
+    }
+
+    public List<String> listarTipos() {
+        return usuarioDAO.listarTipos();
+    }
+
+    public List<String> listarEstados() {
+        return usuarioDAO.listarEstados();
+    }
+}

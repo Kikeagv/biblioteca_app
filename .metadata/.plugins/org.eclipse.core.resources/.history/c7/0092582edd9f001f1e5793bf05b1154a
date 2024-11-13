@@ -1,0 +1,12 @@
+package com.biblioteca.service;
+
+import com.biblioteca.dao.UsuarioDAO;
+
+public class UsuarioService {
+
+    private UsuarioDAO usuarioDAO = new UsuarioDAO();
+
+    public void registrarUsuario(String nombre, String username, String password, String correo, String tipo) {
+        usuarioDAO.registrarUsuario(nombre, username, password, correo, tipo);
+    }
+}

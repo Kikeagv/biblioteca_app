@@ -1,0 +1,92 @@
+package com.biblioteca.ui;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import com.biblioteca.service.UsuarioService;
+
+public class LoginUI {
+
+    private UsuarioService usuarioService = new UsuarioService();
+
+    // Método para mostrar la ventana de inicio de sesión
+    public void mostrarLogin() {
+        // Crear el marco principal
+        JFrame frame = new JFrame("Sistema Biblioteca - Login");
+        frame.setSize(400, 300);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Crear el panel principal
+        JPanel panel = new JPanel();
+        frame.add(panel);
+        colocarComponentes(panel);
+
+        // Hacer visible la ventana
+        frame.setVisible(true);
+    }
+
+    // Método para colocar los componentes en el panel
+    private void colocarComponentes(JPanel panel) {
+        panel.setLayout(null);
+
+        // Etiqueta para el nombre de usuario
+        JLabel usuarioLabel = new JLabel("Usuario:");
+        usuarioLabel.setBounds(10, 20, 80, 25);
+        panel.add(usuarioLabel);
+
+        // Campo de texto para el nombre de usuario
+        JTextField usuarioText = new JTextField(20);
+        usuarioText.setBounds(100, 20, 165, 25);
+        panel.add(usuarioText);
+
+        // Etiqueta para la contraseña
+        JLabel passwordLabel = new JLabel("Contraseña:");
+        passwordLabel.setBounds(10, 50, 80, 25);
+        panel.add(passwordLabel);
+
+        // Campo de texto para la contraseña
+        JPasswordField passwordText = new JPasswordField(20);
+        passwordText.setBounds(100, 50, 165, 25);
+        panel.add(passwordText);
+
+        // Botón de inicio de sesión
+        JButton loginButton = new JButton("Login");
+        loginButton.setBounds(10, 80, 80, 25);
+        panel.add(loginButton);
+
+        // Acción al hacer clic en el botón
+        loginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String username = usuarioText.getText();
+                String password = new String(passwordText.getPassword());
+
+                if (usuarioService.login(username, password)) {
+                    JOptionPane.showMessageDialog(panel, "Inicio de sesión exitoso.");
+                    // Aquí puedes redirigir a la siguiente ventana según el rol
+                } else {
+                    JOptionPane.showMessageDialog(panel, "Usuario o contraseña incorrectos.");
+                }
+            }
+        });
+
+        // Botón para salir
+        JButton salirButton = new JButton("Salir");
+        salirButton.setBounds(100, 80, 80, 25);
+        panel.add(salirButton);
+
+        salirButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+    }
+
+    // Método principal para probar la interfaz
+    public static void main(String[] args) {
+        LoginUI loginUI = new LoginUI();
+        loginUI.mostrarLogin();
+    }
+}

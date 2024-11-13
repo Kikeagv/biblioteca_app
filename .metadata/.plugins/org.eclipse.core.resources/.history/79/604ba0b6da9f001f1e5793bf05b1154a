@@ -1,0 +1,44 @@
+package com.biblioteca.service;
+
+import com.biblioteca.dao.PrestamoDAO;
+
+public class PrestamoService {
+
+    private PrestamoDAO prestamoDAO = new PrestamoDAO();
+
+    // Verifica si un usuario puede realizar un préstamo
+    public boolean puedePrestar(String username) {
+        // Validar que el usuario no tenga mora activa
+        boolean tieneMora = prestamoDAO.tieneMora(username);
+        if (tieneMora) {
+            System.out.println("El usuario tiene mora pendiente y no puede realizar préstamos.");
+        }
+        return !tieneMora;
+    }
+
+    // Registrar un nuevo préstamo
+    public void registrarPrestamo(String username, int ejemplarId) {
+        if (puedePrestar(username)) {
+            prestamoDAO.registrarPrestamo(username, ejemplarId);
+        } else {
+            System.out.println("No se pudo registrar el préstamo debido a mora pendiente.");
+        }
+    }
+
+    // Registrar la devolución de un préstamo
+    public void registrarDevolucion(int prestamoId) {
+        prestamoDAO.registrarDevolucion(prestamoId);
+        System.out.println("Devolución registrada correctamente.");
+    }
+
+    // Listar préstamos activos de un usuario
+    public void listarPrestamosActivos(String username) {
+        var prestamos = prestamoDAO.listarPrestamosActivos(username);
+        if (prestamos.isEmpty()) {
+            System.out.println("El usuario no tiene préstamos activos.");
+        } else {
+            System.out.println("Préstamos activos del usuario:");
+            prestamos.forEach(System.out::println);
+        }
+    }
+}

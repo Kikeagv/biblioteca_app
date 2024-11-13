@@ -1,0 +1,58 @@
+package com.biblioteca.ui;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class GestionMaterialesUI {
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Gestión de Materiales");
+        frame.setSize(400, 250);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+        frame.setResizable(false);
+
+        JLabel titulo = new JLabel("Gestión de Materiales", SwingConstants.CENTER);
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 22));
+        titulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        frame.add(titulo, BorderLayout.NORTH);
+
+        // Panel for buttons
+        JPanel panelBotones = new JPanel(new GridLayout(2, 1, 30, 30)); // Adjusted spacing
+        JButton btnAgregarMaterial = new JButton("Agregar Material Nuevo");
+        JButton btnBuscarMaterial = new JButton("Buscar Materiales");
+
+        estilizarBoton(btnAgregarMaterial, new Color(59, 89, 182), Color.WHITE);
+        estilizarBoton(btnBuscarMaterial, new Color(59, 89, 182), Color.WHITE);
+
+        panelBotones.add(btnAgregarMaterial);
+        panelBotones.add(btnBuscarMaterial);
+        panelBotones.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50)); // Adjusted padding
+        frame.add(panelBotones, BorderLayout.CENTER);
+
+        // Add actions to buttons
+        btnAgregarMaterial.addActionListener(e -> {
+            frame.dispose();
+            new AgregarMaterialUI().mostrarVentana();
+        });
+
+        btnBuscarMaterial.addActionListener(e -> {
+            frame.dispose();
+            new BuscarMaterialesUI().mostrarVentana();
+        });
+
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    private void estilizarBoton(JButton boton, Color bgColor, Color fgColor) {
+        boton.setBackground(bgColor);
+        boton.setForeground(fgColor);
+        boton.setFocusPainted(false);
+        boton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        boton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(bgColor.darker(), 1),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)
+        ));
+    }
+}

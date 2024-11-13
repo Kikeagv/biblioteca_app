@@ -1,0 +1,58 @@
+package com.biblioteca.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.biblioteca.conexion.ConexionBD;
+
+public class UsuarioDAO {
+
+    public boolean validarUsuario(String username, String password) {
+        String sql = "SELECT * FROM usuarios WHERE username = ? AND password = ?";
+        try (Connection con = ConexionBD.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ps.setString(2, password);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void registrarUsuario(String nombre, String username, String password, String tipo) {
+        String sql = "INSERT INTO usuarios (nombre, username, password, tipo) VALUES (?, ?, ?, ?)";
+        try (Connection con = ConexionBD.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, nombre);
+            ps.setString(2, username);
+            ps.setString(3, password);
+            ps.setString(4, tipo);
+            ps.executeUpdate();
+            System.out.println("Usuario registrado correctamente.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<String> listarTipos() {
+        String sql = "SELECT DISTINCT tipo FROM usuarios";
+        List<String> tipos = new ArrayList<>();
+        try (Connection con = ConexionBD.conectar();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                tipos.add(rs.getString("tipo"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tipos;
+    }
+}

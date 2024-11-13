@@ -1,0 +1,66 @@
+package com.biblioteca.ui;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class PrestamosUI {
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Gestión de Préstamos");
+        frame.setSize(400, 300); // Increased height to fit the "Atrás" button
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setResizable(false);
+
+        // Main panel with BoxLayout
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        frame.add(mainPanel);
+
+        // Title
+        JLabel lblTitulo = new JLabel("Gestión de Préstamos", SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 22));
+        lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblTitulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        mainPanel.add(lblTitulo);
+
+        // Buttons
+        JButton btnHacerPrestamo = new JButton("Hacer préstamo de material");
+        JButton btnVerPrestamos = new JButton("Ver préstamos actuales");
+        JButton btnAtras = new JButton("Atrás"); // Added "Atrás" button
+
+        estilizarBoton(btnHacerPrestamo, new Color(59, 89, 182), Color.WHITE);
+        estilizarBoton(btnVerPrestamos, new Color(59, 89, 182), Color.WHITE);
+        estilizarBoton(btnAtras, new Color(192, 57, 43), Color.WHITE); // Red background for "Atrás"
+
+        btnHacerPrestamo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnVerPrestamos.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnAtras.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        mainPanel.add(btnHacerPrestamo);
+        mainPanel.add(Box.createVerticalStrut(20)); // Add spacing between buttons
+        mainPanel.add(btnVerPrestamos);
+        mainPanel.add(Box.createVerticalStrut(20)); // Add spacing before "Atrás" button
+        mainPanel.add(btnAtras);
+
+        // Button actions
+        btnHacerPrestamo.addActionListener(e -> {
+            int materialId = obtenerMaterialSeleccionado(); // Implement a method to get the selected material ID
+            if (materialId != -1) {
+                new HacerPrestamoUI(materialId).mostrarVentana();
+            } else {
+                JOptionPane.showMessageDialog(null, "Debe seleccionar un material.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+
+    private void estilizarBoton(JButton boton, Color bgColor, Color fgColor) {
+        boton.setBackground(bgColor);
+        boton.setForeground(fgColor);
+        boton.setFocusPainted(false);
+        boton.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        boton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(bgColor.darker(), 1),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)
+        ));
+    }
+}

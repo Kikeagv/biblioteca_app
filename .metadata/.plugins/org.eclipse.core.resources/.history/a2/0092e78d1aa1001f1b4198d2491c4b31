@@ -1,0 +1,33 @@
+package com.biblioteca.service;
+
+import com.biblioteca.dao.PrestamoDAO;
+
+public class PrestamoService {
+
+    private PrestamoDAO prestamoDAO = new PrestamoDAO();
+
+    public boolean puedePrestar(String username) {
+        boolean tieneMora = prestamoDAO.tieneMora(username);
+        if (tieneMora) {
+            System.out.println("El usuario tiene mora pendiente.");
+        }
+        return !tieneMora;
+    }
+
+    public void registrarPrestamo(String username, int ejemplarId) {
+        if (!puedePrestar(username)) {
+            System.out.println("No se puede registrar el préstamo debido a mora pendiente.");
+            return;
+        }
+        prestamoDAO.registrarPrestamo(username, ejemplarId);
+        System.out.println("Préstamo registrado correctamente.");
+    }
+
+    public void registrarDevolucion(int prestamoId) {
+        prestamoDAO.registrarDevolucion(prestamoId);
+    }
+
+    public double calcularMora(int prestamoId, double tasaDiaria) {
+        return prestamoDAO.calcularMora(prestamoId, tasaDiaria);
+    }
+}

@@ -1,0 +1,81 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.service.UsuarioService;
+
+import javax.swing.*;
+
+public class UsuariosUI {
+
+    private UsuarioService usuarioService = new UsuarioService();
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Agregar Usuario");
+        frame.setSize(500, 400);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        frame.add(panel);
+        colocarComponentes(panel);
+
+        frame.setVisible(true);
+    }
+
+    private void colocarComponentes(JPanel panel) {
+        panel.setLayout(null);
+
+        JLabel lblNombre = new JLabel("Nombre:");
+        lblNombre.setBounds(20, 20, 100, 25);
+        panel.add(lblNombre);
+
+        JTextField txtNombre = new JTextField(20);
+        txtNombre.setBounds(150, 20, 200, 25);
+        panel.add(txtNombre);
+
+        JLabel lblUsername = new JLabel("Usuario:");
+        lblUsername.setBounds(20, 60, 100, 25);
+        panel.add(lblUsername);
+
+        JTextField txtUsername = new JTextField(20);
+        txtUsername.setBounds(150, 60, 200, 25);
+        panel.add(txtUsername);
+
+        JLabel lblCorreo = new JLabel("Correo:");
+        lblCorreo.setBounds(20, 100, 100, 25);
+        panel.add(lblCorreo);
+
+        JTextField txtCorreo = new JTextField(20);
+        txtCorreo.setBounds(150, 100, 200, 25);
+        panel.add(txtCorreo);
+
+        JLabel lblPassword = new JLabel("Contraseña:");
+        lblPassword.setBounds(20, 140, 100, 25);
+        panel.add(lblPassword);
+
+        JPasswordField txtPassword = new JPasswordField(20);
+        txtPassword.setBounds(150, 140, 200, 25);
+        panel.add(txtPassword);
+
+        JLabel lblTipo = new JLabel("Tipo:");
+        lblTipo.setBounds(20, 180, 100, 25);
+        panel.add(lblTipo);
+
+        JComboBox<String> cmbTipo = new JComboBox<>(new String[]{"Administrador", "Profesor", "Alumno"});
+        cmbTipo.setBounds(150, 180, 200, 25);
+        panel.add(cmbTipo);
+
+        JButton btnAgregar = new JButton("Agregar Usuario");
+        btnAgregar.setBounds(150, 230, 150, 25);
+        panel.add(btnAgregar);
+
+        btnAgregar.addActionListener(e -> {
+            String nombre = txtNombre.getText();
+            String username = txtUsername.getText();
+            String correo = txtCorreo.getText();
+            String password = new String(txtPassword.getPassword());
+            String tipo = (String) cmbTipo.getSelectedItem();
+
+            usuarioService.registrarUsuario(nombre, username, password, correo, tipo);
+            JOptionPane.showMessageDialog(panel, "Usuario agregado correctamente.");
+        });
+    }
+}

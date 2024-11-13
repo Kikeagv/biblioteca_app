@@ -1,0 +1,44 @@
+package com.biblioteca.ui;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class MainUI {
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Sistema Biblioteca - Menú Principal");
+        frame.setSize(600, 400);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        frame.add(panel);
+        colocarComponentes(panel);
+
+        frame.setVisible(true);
+    }
+
+    private static void colocarComponentes(JPanel panel) {
+        panel.setLayout(null);
+
+        JLabel title = new JLabel("Menú Principal");
+        title.setBounds(220, 20, 200, 30);
+        panel.add(title);
+
+        JButton btnUsuarios = new JButton("Gestión de Usuarios");
+        btnUsuarios.setBounds(200, 80, 200, 30);
+        panel.add(btnUsuarios);
+
+        JButton btnEjemplares = new JButton("Gestión de Ejemplares");
+        btnEjemplares.setBounds(200, 130, 200, 30);
+        panel.add(btnEjemplares);
+
+        JButton btnPrestamos = new JButton("Gestión de Préstamos");
+        btnPrestamos.setBounds(200, 180, 200, 30);
+        panel.add(btnPrestamos);
+
+        btnUsuarios.addActionListener(e -> new UsuariosUI().mostrarVentana());
+        btnEjemplares.addActionListener(e -> new EjemplaresUI().mostrarVentana());
+        btnPrestamos.addActionListener(e -> new PrestamosUI().mostrarVentana());
+    }
+}

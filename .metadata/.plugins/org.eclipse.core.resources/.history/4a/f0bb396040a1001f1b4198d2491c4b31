@@ -1,0 +1,77 @@
+package com.biblioteca.ui;
+
+import com.biblioteca.service.PrestamoService;
+import com.biblioteca.dao.UsuarioDAO;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
+
+public class HacerPrestamoUI {
+    private PrestamoService prestamoService = new PrestamoService();
+    private UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private int materialId;
+
+    public HacerPrestamoUI(int materialId) {
+        this.materialId = materialId; // Material ID passed from the material selection UI
+    }
+
+    public void mostrarVentana() {
+        JFrame frame = new JFrame("Hacer Préstamo de Material");
+        frame.setSize(500, 400);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        frame.add(panel);
+
+        colocarComponentes(panel, frame);
+
+        frame.setVisible(true);
+    }
+
+    private void colocarComponentes(JPanel panel, JFrame frame) {
+        JLabel lblUsuarios = new JLabel("Seleccione Usuario:");
+        lblUsuarios.setBounds(20, 20, 150, 25);
+        panel.add(lblUsuarios);
+
+        JComboBox<String> cmbUsuarios = new JComboBox<>();
+        cmbUsuarios.setBounds(180, 20, 250, 25);
+        panel.add(cmbUsuarios);
+
+        // Populate the combo box with users without overdue loans
+        List<String[]> usuarios = usuarioDAO.obtenerUsuariosSinAtrasos();
+        for (String[] usuario : usuarios) {
+            cmbUsuarios.addItem(usuario[1] + " - " + usuario[2]); // Display "Name - Username"
+        }
+
+        JButton btnPrestar = new JButton("Registrar Préstamo");
+        btnPrestar.setBounds(150, 100, 200, 30);
+        panel.add(btnPrestar);
+
+        JButton btnCancelar = new JButton("Cancelar");
+        btnCancelar.setBounds(150, 150, 200, 30);
+        panel.add(btnCancelar);
+
+        // Action to register the loan
+        btnPrestar.addActionListener(e -> {
+            int selectedIndex = cmbUsuarios.getSelectedIndex();
+            if (selectedIndex == -1) {
+                JOptionPane.showMessageDialog(panel, "Debe seleccionar un usuario.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try {
+                int userId = Integer.parseInt(usuarios.get(selectedIndex)[0]); // Get the user ID
+                prestamoService.registrarPrestamo(userId, materialId);
+                JOptionPane.showMessageDialog(panel, "Préstamo registrado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                frame.dispose(); // Close the window
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(panel, "Error al registrar el préstamo: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // Action to cancel the loan process
+        btnCancelar.addActionListener(e -> frame.dispose());
+    }
+}
